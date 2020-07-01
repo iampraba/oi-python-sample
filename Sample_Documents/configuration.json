@@ -1,0 +1,6 @@
+{
+  "apikey": "2ae438cf864488657cc9754a27daa480",
+  "writer_api_base_url": "https://api.office-integrator.com/writer/officeapi/",
+  "sheet_api_base_url": "https://api.office-integrator.com/sheet/officeapi/",
+  "show_api_base_url": "https://api.office-integrator.com/show/officeapi/"
+}
