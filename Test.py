@@ -93,6 +93,9 @@ class MyClass(object):
     def edit_document():
         try:
             edit_doc = EditDocument.get_instance()
+            edit_doc.set_document_info("document_id", "10000000")
+            edit_doc.set_user_info("user_id", "1000")
+            edit_doc.set_user_info("display_name", "Matt")
             edit_doc.set_callback_settings("save_format", "docx")
             edit_doc.set_callback_settings("save_url", "https://domain.com/save.php")
             edit_doc.set_callback_settings("context_info", "additional doc or user info")
@@ -112,6 +115,9 @@ class MyClass(object):
     def co_edit_document():
         try:
             edit_doc = CoEditDocument.get_instance()
+            edit_doc.set_user_info("user_id", "2000")
+            edit_doc.set_user_info("display_name", "Anil")
+            edit_doc.set_document_info("document_id", "10000000")
             edit_doc.set_callback_settings("save_format", "docx")
             edit_doc.set_callback_settings("save_url", "https://domain.com/save.php")
             edit_doc.set_callback_settings("context_info", "additional doc or user info")
@@ -154,10 +160,12 @@ class MyClass(object):
             watermark_doc.upload_document("document", "Sample_Documents/watermark_source_document.docx")
             response = watermark_doc.watermark_document()
             response_headers = response.response_headers
-            for key in response_headers:
-                print("{0}: {1}".format(key, response_headers[key]))
-            with open("./output/" + "watermark_" + response.file_name, "wb") as f:
+            #for key in response_headers:
+            #    print("{0}: {1}".format(key, response_headers[key]))
+            output_file_name = "watermark_" + response.file_name;
+            with open("./output/" + output_file_name, "wb") as f:
                 f.write(response.file_content)
+            print("\nWatermark output file saved in output folder with filename : " + output_file_name)
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -230,10 +238,11 @@ class MyClass(object):
             merge_download.upload_document("merge_data_json_content", "Sample_Documents/merge_data.json")
             response = merge_download.merge_and_download()
             response_headers = response.response_headers
-            for key in response_headers:
-                print("{0}: {1}".format(key, response_headers[key]))
+            #for key in response_headers:
+            #    print("{0}: {1}".format(key, response_headers[key]))
             with open("./output/" + response.file_name, "wb") as f:
                 f.write(response.file_content)
+            print("\nMerged document stored in output folder with filename : " + response.file_name)
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -249,10 +258,12 @@ class MyClass(object):
             convert_document.upload_document("document", "Sample_Documents/Sample_Upload_document.docx")
             response = convert_document.convert_document()
             response_headers = response.response_headers
-            for key in response_headers:
-                print("{0}: {1}".format(key, response_headers[key]))
-            with open("./output/" + response.file_name, "wb") as f:
+            #for key in response_headers:
+            #   print("{0}: {1}".format(key, response_headers[key]))
+            output_file_name = "conversion_" + response.file_name;
+            with open("./output/" + output_file_name, "wb") as f:
                 f.write(response.file_content)
+            print("\nConverted document stored in output folder with filename : " + output_file_name)
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -300,6 +311,8 @@ class MyClass(object):
     def edit_spreadsheet():
         try:
             edit_sheet = EditSpreadsheet.get_instance()
+            #edit_sheet.set_default_user_info("display_name", "Matt")
+            #edit_sheet.set_default_document_info("document_id", "200000")
             edit_sheet.set_callback_settings("save_format", "xlsx")
             edit_sheet.set_callback_settings("save_url", "https://zylker.com/save.php")
             edit_sheet.set_callback_settings("context_info", "additional doc or user info")
@@ -319,6 +332,8 @@ class MyClass(object):
     def co_edit_spreadsheet():
         try:
             co_edit_sheet = CoEditSpreadsheet.get_instance()
+            #co_edit_sheet.set_default_user_info("display_name", "Anil")
+            #co_edit_sheet.set_default_document_info("document_id", "200000")
             co_edit_sheet.set_callback_settings("save_format", "xlsx")
             co_edit_sheet.set_callback_settings("save_url", "https://zylker.com/save.php")
             co_edit_sheet.set_callback_settings("context_info", "additional doc or user info")
@@ -372,7 +387,10 @@ class MyClass(object):
     def edit_presentation():
         try:
             edit_show = EditPresentation.get_instance()
+            #edit_show.set_default_user_info("user_id", "3000")
+            #edit_show.set_default_user_info("display_name", "Matt")
             edit_show.set_callback_settings("save_format", "pptx")
+            #edit_show.set_default_document_info("document_id", "3000000")
             edit_show.set_callback_settings("save_url", "https://domain.com/save.php")
             edit_show.set_callback_settings("context_info", "additional doc or user info")
             edit_show.upload_document("document", "Sample_Documents/Sample_Upload_Show.pptx")
@@ -391,7 +409,10 @@ class MyClass(object):
     def co_edit_presentation():
         try:
             co_edit_show = CoEditPresentation.get_instance()
+            #co_edit_show.set_default_user_info("user_id", "3000")
+            #co_edit_show.set_default_user_info("display_name", "Anil")
             co_edit_show.set_callback_settings("save_format", "pptx")
+            #co_edit_show.set_default_document_info("document_id", "3000000")
             co_edit_show.set_callback_settings("save_url", "https://domain.com/save.php")
             co_edit_show.set_callback_settings("context_info", "additional doc or user info")
             co_edit_show.upload_document("document", "Sample_Documents/Sample_Upload_Show.pptx")
@@ -495,7 +516,7 @@ if __name__ == "__main__":
 
     obj.edit_document()
 
-    input("\nPress Enter To Test Co-Edit Session API:\n")
+    input("\nPress Enter To Test Co-Edit session for above document:\n")
 
     obj.co_edit_document()
 
@@ -505,13 +526,17 @@ if __name__ == "__main__":
 
     input("\nPress Enter To Test Watermark Document API:\n")
 
+    print("\nWater mark input document taken from Sample_Documents folder. ");
+
     obj.watermark_document()
 
     input("\nPress Enter To Test Create Template API:\n")  # *****
 
     obj.create_template()  # *****
 
-    input("\nPress Enter To Test Get Fields API:\n")
+    input("\nPress Enter To Test Get Fields API(Merged fields in document will be returned as response):\n")
+
+    print("\nInput document with merge fields: Sample_Documents/Merge_templete.docx");
 
     obj.get_fields()
 
@@ -524,7 +549,7 @@ if __name__ == "__main__":
     obj.merge_and_download()  # *****
 
     input("\nPress Enter To Test Conversion API API:\n")
-    
+
     obj.convert_document()
 
     input("\nPress Enter To Test Comparison API API:\n")
@@ -540,7 +565,7 @@ if __name__ == "__main__":
     obj.edit_spreadsheet()
 
     input("\nPress Enter To Test Co-Edit Spreadsheet API:\n")
-    
+
     obj.co_edit_spreadsheet()
 
     input("\nPress Enter To Test Preview Spreadsheet API:\n")
@@ -566,11 +591,11 @@ if __name__ == "__main__":
     input("\nPress Enter To Test Convert Presentation API:\n")  # *****
 
     obj.convert_presentation()  # *****
-    
+
     input("\nPress Enter To Test Delete Document API:\n")
 
     obj.delete_document()
-    
+
     input("\nPress Enter To Test Delete Session API:\n")
 
     obj.delete_document_session()
