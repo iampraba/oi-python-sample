@@ -5,7 +5,8 @@ Office Integrator implementation code sample for Python language.
 Clone this repository in your local machine.
 
 Install the depencies using pip command.
-pip3 install -r requirements.txt
+
+**pip3 install -r requirements.txt**
 
 Run **python3 Test.py** command in termial which will invoke Office Integrator API's. API reponses will be printed on the termial. 
 

@@ -1,10 +1,22 @@
 
+import random  # Imported to generate random document id
+
+import requests
+
 from ClientSideException import ZOIException
 from Operations import *
+from Response import APIResponse, FileAPIResponse
 from RestClient import ZOIRestClient
 
 
 class MyClass(object):
+    created_document_id = ""
+    created_session_id = ""
+
+    collaboration_document_id = random.randint(10000000, 100000000)
+
+    shouldSaveAsFile = "N"
+
     def __init__(self):
         """
         Constructor
@@ -57,31 +69,39 @@ class MyClass(object):
             print(ex.error_details)
             print(ex.error_content)
 
+    # ALTERNATE WAYS TO PASS ON THE CONFIGURATION - SAME APPLIES FOR ALL METHODS IN THIS SDK
+
+    # create_doc.set_bulk_callback_settings(save_format_or_list="docx", save_url="https://domain.com/save.php", context_info="additional doc or user info")
+    # create_doc.set_bulk_callback_settings("docx", save_url="https://domain.com/save.php")
+    # create_doc.set_bulk_callback_settings(save_url="https://domain.com/save.php")
+
+    # my_callback_settings = [
+    #     "docx",
+    #     "https://domain.com/save.php",
+    #     "additional doc or user info"
+    # ]
+    # create_doc.set_bulk_callback_settings(my_callback_settings)
+
     @staticmethod
     def create_document():
         try:
             create_doc = CreateDocument.get_instance()
+
             create_doc.set_callback_settings("save_format", "docx")
             create_doc.set_callback_settings("save_url", "https://domain.com/save.php")
             create_doc.set_callback_settings("context_info", "additional doc or user info")
-
-            # ALTERNATE WAYS TO PASS ON THE CONFIGURATION - SAME APPLIES FOR ALL METHODS IN THIS SDK
-
-            # create_doc.set_bulk_callback_settings(save_format_or_list="docx", save_url="https://domain.com/save.php", context_info="additional doc or user info")
-            # create_doc.set_bulk_callback_settings("docx", save_url="https://domain.com/save.php")
-            # create_doc.set_bulk_callback_settings(save_url="https://domain.com/save.php")
-
-            # my_callback_settings = [
-            #     "docx",
-            #     "https://domain.com/save.php",
-            #     "additional doc or user info"
-            # ]
-            # create_doc.set_bulk_callback_settings(my_callback_settings)
 
             response = create_doc.create_document()
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+
+            # To demonstrate delete document and delete session
+            MyClass.created_document_id = response_json["document_id"]
+            MyClass.created_session_id = response_json["session_id"]
+
+            # To save API response as JSON file
+            MyClass.saveResponseAsJSONFile("CreateDocument", response_json)
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -93,17 +113,25 @@ class MyClass(object):
     def edit_document():
         try:
             edit_doc = EditDocument.get_instance()
-            edit_doc.set_document_info("document_id", "10000000")
+
+            print("Using document ID: " + str(
+                MyClass.collaboration_document_id) + "\nIn response, Navigate to the document using \"document_url\" and start editing your document.\n")
+
+            edit_doc.set_document_info("document_id", MyClass.collaboration_document_id)
             edit_doc.set_user_info("user_id", "1000")
             edit_doc.set_user_info("display_name", "Matt")
             edit_doc.set_callback_settings("save_format", "docx")
             edit_doc.set_callback_settings("save_url", "https://domain.com/save.php")
             edit_doc.set_callback_settings("context_info", "additional doc or user info")
             edit_doc.upload_document("document", "Sample_Documents/Sample_Upload_document.docx")
+
             response = edit_doc.edit_document()
+
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+            MyClass.saveResponseAsJSONFile("EditDocument",
+                                           response_json)  # In case if response has to be saved as JSON file
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -115,9 +143,13 @@ class MyClass(object):
     def co_edit_document():
         try:
             edit_doc = CoEditDocument.get_instance()
+
+            print("Using document ID: " + str(
+                MyClass.collaboration_document_id) + ". Share the \"document_url\" in response to collaborators\n")
+
             edit_doc.set_user_info("user_id", "2000")
             edit_doc.set_user_info("display_name", "Anil")
-            edit_doc.set_document_info("document_id", "10000000")
+            edit_doc.set_document_info("document_id", MyClass.collaboration_document_id)
             edit_doc.set_callback_settings("save_format", "docx")
             edit_doc.set_callback_settings("save_url", "https://domain.com/save.php")
             edit_doc.set_callback_settings("context_info", "additional doc or user info")
@@ -126,6 +158,8 @@ class MyClass(object):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+            MyClass.saveResponseAsJSONFile("CoEditDocument",
+                                           response_json)  # In case if response has to be saved as JSON file
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -138,11 +172,21 @@ class MyClass(object):
         try:
             preview_doc = PreviewDocument.get_instance()
             preview_doc.set_lang("en")
-            preview_doc.upload_document("document", "Sample_Documents/Sample_Upload_document.docx")
+
+            # Upload your local files here
+            # preview_doc.upload_document("document", "Sample_Documents/Sample_Upload_document.docx")
+
+            print("https://workdrive.zohopublic.com/writer/open/kyabqdd871056f7fa4bf6ae7a5c3bf1e85e18")
+
+            print("\nUsing the save_url of document created using Create Document API,\n")
+            preview_doc.set_url("https://workdrive.zohopublic.com/writer/open/kyabqdd871056f7fa4bf6ae7a5c3bf1e85e18")
+
             response = preview_doc.preview_document()
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+            MyClass.saveResponseAsJSONFile("PreviewDocument",
+                                           response_json)  # In case if response has to be saved as JSON file
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -157,15 +201,23 @@ class MyClass(object):
             watermark_doc.set_watermark_settings("type", "text")
             watermark_doc.set_watermark_settings("opacity", "0.5")
             watermark_doc.set_watermark_settings("text", "Zoho Corporation Private Limited, Chennai.")
+
             watermark_doc.upload_document("document", "Sample_Documents/watermark_source_document.docx")
+
+            # watermark_doc.set_url(MyClass.created_document_save_url)
+
             response = watermark_doc.watermark_document()
-            response_headers = response.response_headers
-            #for key in response_headers:
-            #    print("{0}: {1}".format(key, response_headers[key]))
-            output_file_name = "watermark_" + response.file_name;
-            with open("./output/" + output_file_name, "wb") as f:
-                f.write(response.file_content)
-            print("\nWatermark output file saved in output folder with filename : " + output_file_name)
+            if isinstance(response, APIResponse):
+                response_json = response.response_json
+                for key in response_json:
+                    print("{0}: {1}".format(key, response_json[key]))
+            elif isinstance(response, FileAPIResponse):
+                output_file_name = "watermark_" + response.file_name
+                with open("./output/" + output_file_name, "wb") as f:
+                    f.write(response.file_content)
+                print("\nWatermark output file saved in output folder with filename : " + output_file_name)
+            else:
+                print(str(response))
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -196,11 +248,17 @@ class MyClass(object):
     def get_fields():
         try:
             get_fields = GetFields.get_instance()
+
+            # get_fields.set_file_url("File URL Here")
+
+            # Upload your local files here
             get_fields.upload_document("file_content", "Sample_Documents/Merge_templete.docx")
             response = get_fields.get_fields()
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+            MyClass.saveResponseAsJSONFile("GetFields",
+                                           response_json)  # In case if response has to be saved as JSON file
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -222,6 +280,8 @@ class MyClass(object):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+            MyClass.saveResponseAsJSONFile("MergeAndDeliver",
+                                           response_json)  # In case if response has to be saved as JSON file
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -237,12 +297,18 @@ class MyClass(object):
             merge_download.upload_document("file_content", "Sample_Documents/Merge_templete.docx")
             merge_download.upload_document("merge_data_json_content", "Sample_Documents/merge_data.json")
             response = merge_download.merge_and_download()
-            response_headers = response.response_headers
-            #for key in response_headers:
-            #    print("{0}: {1}".format(key, response_headers[key]))
-            with open("./output/" + response.file_name, "wb") as f:
-                f.write(response.file_content)
-            print("\nMerged document stored in output folder with filename : " + response.file_name)
+            if isinstance(response, APIResponse):
+                response_json = response.response_json
+                for key in response_json:
+                    print("{0}: {1}".format(key, response_json[key]))
+            elif isinstance(response, FileAPIResponse):
+                output_file_name = "conversion_" + response.file_name
+                output_file_name = output_file_name.replace("\"", "")
+                with open("./output/" + output_file_name, "wb") as f:
+                    f.write(response.file_content)
+                print("Merged document stored in output folder with filename : " + output_file_name)
+            else:
+                print(str(response))
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -257,13 +323,17 @@ class MyClass(object):
             convert_document.set_format("pdf")
             convert_document.upload_document("document", "Sample_Documents/Sample_Upload_document.docx")
             response = convert_document.convert_document()
-            response_headers = response.response_headers
-            #for key in response_headers:
-            #   print("{0}: {1}".format(key, response_headers[key]))
-            output_file_name = "conversion_" + response.file_name;
-            with open("./output/" + output_file_name, "wb") as f:
-                f.write(response.file_content)
-            print("\nConverted document stored in output folder with filename : " + output_file_name)
+            if isinstance(response, APIResponse):
+                response_json = response.response_json
+                for key in response_json:
+                    print("{0}: {1}".format(key, response_json[key]))
+            elif isinstance(response, FileAPIResponse):
+                output_file_name = "conversion_" + response.file_name
+                with open("./output/" + output_file_name, "wb") as f:
+                    f.write(response.file_content)
+                print("Converted document stored in output folder with filename : " + output_file_name)
+            else:
+                print(str(response))
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -282,6 +352,8 @@ class MyClass(object):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+            MyClass.saveResponseAsJSONFile("CompareDocument",
+                                           response_json)  # In case if response has to be saved as JSON file
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -300,6 +372,8 @@ class MyClass(object):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+            MyClass.saveResponseAsJSONFile("CreateSpreadsheet",
+                                           response_json)  # In case if response has to be saved as JSON file
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -311,8 +385,8 @@ class MyClass(object):
     def edit_spreadsheet():
         try:
             edit_sheet = EditSpreadsheet.get_instance()
-            #edit_sheet.set_default_user_info("display_name", "Matt")
-            #edit_sheet.set_default_document_info("document_id", "200000")
+            edit_sheet.set_user_info("display_name", "Matt")
+            edit_sheet.set_document_info("document_id", MyClass.collaboration_document_id)
             edit_sheet.set_callback_settings("save_format", "xlsx")
             edit_sheet.set_callback_settings("save_url", "https://zylker.com/save.php")
             edit_sheet.set_callback_settings("context_info", "additional doc or user info")
@@ -321,6 +395,8 @@ class MyClass(object):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+            MyClass.saveResponseAsJSONFile("EditSpreadsheet",
+                                           response_json)  # In case if response has to be saved as JSON file
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -332,8 +408,8 @@ class MyClass(object):
     def co_edit_spreadsheet():
         try:
             co_edit_sheet = CoEditSpreadsheet.get_instance()
-            #co_edit_sheet.set_default_user_info("display_name", "Anil")
-            #co_edit_sheet.set_default_document_info("document_id", "200000")
+            co_edit_sheet.set_user_info("display_name", "Anil")
+            co_edit_sheet.set_document_info("document_id", MyClass.collaboration_document_id)
             co_edit_sheet.set_callback_settings("save_format", "xlsx")
             co_edit_sheet.set_callback_settings("save_url", "https://zylker.com/save.php")
             co_edit_sheet.set_callback_settings("context_info", "additional doc or user info")
@@ -342,6 +418,8 @@ class MyClass(object):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+            MyClass.saveResponseAsJSONFile("CoEditSpreadsheet",
+                                           response_json)  # In case if response has to be saved as JSON file
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -358,6 +436,8 @@ class MyClass(object):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+            MyClass.saveResponseAsJSONFile("PreviewSpreadsheet",
+                                           response_json)  # In case if response has to be saved as JSON file
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -376,6 +456,8 @@ class MyClass(object):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+            MyClass.saveResponseAsJSONFile("CreatePresentation",
+                                           response_json)  # In case if response has to be saved as JSON file
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -387,10 +469,10 @@ class MyClass(object):
     def edit_presentation():
         try:
             edit_show = EditPresentation.get_instance()
-            #edit_show.set_default_user_info("user_id", "3000")
-            #edit_show.set_default_user_info("display_name", "Matt")
+            edit_show.set_user_info("user_id", "3000")
+            edit_show.set_user_info("display_name", "Matt")
             edit_show.set_callback_settings("save_format", "pptx")
-            #edit_show.set_default_document_info("document_id", "3000000")
+            edit_show.set_document_info("document_id", MyClass.collaboration_document_id)
             edit_show.set_callback_settings("save_url", "https://domain.com/save.php")
             edit_show.set_callback_settings("context_info", "additional doc or user info")
             edit_show.upload_document("document", "Sample_Documents/Sample_Upload_Show.pptx")
@@ -398,6 +480,8 @@ class MyClass(object):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+            MyClass.saveResponseAsJSONFile("EditPresentation",
+                                           response_json)  # In case if response has to be saved as JSON file
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -409,10 +493,10 @@ class MyClass(object):
     def co_edit_presentation():
         try:
             co_edit_show = CoEditPresentation.get_instance()
-            #co_edit_show.set_default_user_info("user_id", "3000")
-            #co_edit_show.set_default_user_info("display_name", "Anil")
+            co_edit_show.set_user_info("user_id", "3000")
+            co_edit_show.set_user_info("display_name", "Anil")
             co_edit_show.set_callback_settings("save_format", "pptx")
-            #co_edit_show.set_default_document_info("document_id", "3000000")
+            co_edit_show.set_document_info("document_id", MyClass.collaboration_document_id)
             co_edit_show.set_callback_settings("save_url", "https://domain.com/save.php")
             co_edit_show.set_callback_settings("context_info", "additional doc or user info")
             co_edit_show.upload_document("document", "Sample_Documents/Sample_Upload_Show.pptx")
@@ -420,6 +504,8 @@ class MyClass(object):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+            MyClass.saveResponseAsJSONFile("CoEditPresentation",
+                                           response_json)  # In case if response has to be saved as JSON file
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -436,6 +522,8 @@ class MyClass(object):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
+            MyClass.saveResponseAsJSONFile("PreviewPresentation",
+                                           response_json)  # In case if response has to be saved as JSON file
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -450,11 +538,18 @@ class MyClass(object):
             convert_show.upload_document("document", "Sample_Documents/Sample_Upload_Show.pptx")
             convert_show.set_format("pdf")
             response = convert_show.convert_presentation()
-            response_headers = response.response_headers
-            for key in response_headers:
-                print("{0}: {1}".format(key, response_headers[key]))
-            with open("./output/" + response.file_name, "wb") as f:
-                f.write(response.file_content)
+            if isinstance(response, APIResponse):
+                response_json = response.response_json
+                for key in response_json:
+                    print("{0}: {1}".format(key, response_json[key]))
+            elif isinstance(response, FileAPIResponse):
+                output_file_name = "conversion_" + response.file_name
+                output_file_name = output_file_name.replace("\"", "")
+                with open("./output/" + output_file_name, "wb") as f:
+                    f.write(response.file_content)
+                print("Converted document stored in output folder with filename : " + output_file_name)
+            else:
+                print(str(response))
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -466,9 +561,24 @@ class MyClass(object):
     def delete_document():
         try:
             delete_document = Delete.get_instance()
-            # delete_document.set_document_id("")  # Actual set document id call
-            delete_document.set_document_id(input("Enter the document ID to delete: "))  # Used ONLY for demonstration
-            response = delete_document.delete_document()
+
+            # delete_writer_document.set_document_id("")  # Actual set document id call
+            serviceId = input("Choose a service: \n1) Writer\t2) Sheet\t3) Show")
+            if serviceId == 1:
+                delete_document.set_document_id(
+                    input("Enter the document ID to delete: "))  # Used ONLY for demonstration
+                response = delete_document.delete_writer_document()
+            elif serviceId == 2:
+                delete_document.set_document_id(
+                    input("Enter the document ID to delete: "))  # Used ONLY for demonstration
+                response = delete_document.delete_sheet_document()
+            elif serviceId == 3:
+                delete_document.set_document_id(
+                    input("Enter the document ID to delete: "))  # Used ONLY for demonstration
+                response = delete_document.delete_show_document()
+            else:
+                print("Invalid Service ID")
+                return
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
@@ -480,12 +590,26 @@ class MyClass(object):
             print(ex.error_content)
 
     @staticmethod
-    def delete_document_session():
+    def delete_session():
         try:
-            delete_document = Delete.get_instance()
-            # delete_document.set_session_id("")  # Actual set session id call
-            delete_document.set_session_id(input("Enter the session ID to Delete: "))  # Used ONLY for demonstration
-            response = delete_document.delete_document_session()
+            delete_session = Delete.get_instance()
+            # delete_session.set_session_id("")  # Actual set session id call
+            serviceId = input("Choose a service: \n1) Writer\t2) Sheet\t3) Show")
+            if serviceId == 1:
+                delete_session.set_session_id(
+                    input("Enter the session ID to Delete: "))  # Used ONLY for demonstration
+                response = delete_session.delete_writer_session()
+            elif serviceId == 2:
+                delete_session.set_session_id(
+                    input("Enter the session ID to Delete: "))  # Used ONLY for demonstration
+                response = delete_session.delete_sheet_session()
+            elif serviceId == 3:
+                delete_session.set_session_id(
+                    input("Enter the session ID to Delete: "))  # Used ONLY for demonstration
+                response = delete_session.delete_show_session()
+            else:
+                print("Invalid Service ID")
+                return
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
@@ -495,6 +619,126 @@ class MyClass(object):
             print(ex.error_message)
             print(ex.error_details)
             print(ex.error_content)
+
+    @staticmethod
+    def delete_writer_document():
+        try:
+            delete_writer_document = Delete.get_instance()
+
+            print("Use created document ID: " + str(MyClass.created_document_id) + "\n")
+
+            # delete_writer_document.set_document_id("")  # Actual set document id call
+            delete_writer_document.set_document_id(
+                input("Enter the document ID to delete: "))  # Used ONLY for demonstration
+            response = delete_writer_document.delete_writer_document()
+            response_json = response.response_json
+            for key in response_json:
+                print("{0}: {1}".format(key, response_json[key]))
+        except ZOIException as ex:
+            print(ex.status_code)
+            print(ex.error_code)
+            print(ex.error_message)
+            print(ex.error_details)
+            print(ex.error_content)
+
+    @staticmethod
+    def delete_writer_session():
+        try:
+            delete_writer_session = Delete.get_instance()
+
+            print("Use created session ID: " + str(MyClass.created_session_id) + "\n")
+
+            # delete_writer_session.set_session_id("")  # Actual set session id call
+            delete_writer_session.set_session_id(
+                input("Enter the session ID to Delete: "))  # Used ONLY for demonstration
+            response = delete_writer_session.delete_writer_session()
+            response_json = response.response_json
+            for key in response_json:
+                print("{0}: {1}".format(key, response_json[key]))
+        except ZOIException as ex:
+            print(ex.status_code)
+            print(ex.error_code)
+            print(ex.error_message)
+            print(ex.error_details)
+            print(ex.error_content)
+
+    @staticmethod
+    def delete_sheet_document():
+        try:
+            delete_sheet_document = Delete.get_instance()
+            # delete_sheet_document.set_document_id("")  # Actual set document id call
+            delete_sheet_document.set_document_id(
+                input("Enter the document ID to delete: "))  # Used ONLY for demonstration
+            response = delete_sheet_document.delete_sheet_document()
+            response_json = response.response_json
+            for key in response_json:
+                print("{0}: {1}".format(key, response_json[key]))
+        except ZOIException as ex:
+            print(ex.status_code)
+            print(ex.error_code)
+            print(ex.error_message)
+            print(ex.error_details)
+            print(ex.error_content)
+
+    @staticmethod
+    def delete_sheet_session():
+        try:
+            delete_sheet_session = Delete.get_instance()
+            # delete_sheet_session.set_session_id("")  # Actual set session id call
+            delete_sheet_session.set_session_id(
+                input("Enter the session ID to Delete: "))  # Used ONLY for demonstration
+            response = delete_sheet_session.delete_sheet_session()
+            response_json = response.response_json
+            for key in response_json:
+                print("{0}: {1}".format(key, response_json[key]))
+        except ZOIException as ex:
+            print(ex.status_code)
+            print(ex.error_code)
+            print(ex.error_message)
+            print(ex.error_details)
+            print(ex.error_content)
+
+    @staticmethod
+    def delete_show_document():
+        try:
+            delete_show_document = Delete.get_instance()
+            # delete_show_document.set_document_id("")  # Actual set document id call
+            delete_show_document.set_document_id(
+                input("Enter the document ID to delete: "))  # Used ONLY for demonstration
+            response = delete_show_document.delete_show_document()
+            response_json = response.response_json
+            for key in response_json:
+                print("{0}: {1}".format(key, response_json[key]))
+        except ZOIException as ex:
+            print(ex.status_code)
+            print(ex.error_code)
+            print(ex.error_message)
+            print(ex.error_details)
+            print(ex.error_content)
+
+    @staticmethod
+    def delete_show_session():
+        try:
+            delete_show_session = Delete.get_instance()
+            # delete_show_session.set_session_id("")  # Actual set session id call
+            delete_show_session.set_session_id(input("Enter the session ID to Delete: "))  # Used ONLY for demonstration
+            response = delete_show_session.delete_show_session()
+            response_json = response.response_json
+            for key in response_json:
+                print("{0}: {1}".format(key, response_json[key]))
+        except ZOIException as ex:
+            print(ex.status_code)
+            print(ex.error_code)
+            print(ex.error_message)
+            print(ex.error_details)
+            print(ex.error_content)
+
+    @staticmethod
+    def saveResponseAsJSONFile(apiName, response_json):  # Just to save response as JSON file in output folder
+        import json
+        if MyClass.shouldSaveAsFile == "y" or "Y":
+            with open("./output/" + apiName + "_response.json", "w") as f:
+                json.dump(response_json, f, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 
 if __name__ == "__main__":
@@ -506,7 +750,9 @@ if __name__ == "__main__":
 
     obj.configure_way3()
 
-    print("STARTING ZOHO WRITER SDK...\n")
+    print("STARTING ZOHO OFFICE INTEGRATION SDK...\n")
+
+    obj.shouldSaveAsFile = input("Do you want to save response as file? (y/N)")
 
     input("\nPress Enter To Test Create New Document API:\n")
 
@@ -526,17 +772,17 @@ if __name__ == "__main__":
 
     input("\nPress Enter To Test Watermark Document API:\n")
 
-    print("\nWater mark input document taken from Sample_Documents folder. ");
+    print("Water mark input document taken from Sample_Documents folder. ")
 
     obj.watermark_document()
 
-    input("\nPress Enter To Test Create Template API:\n")  # *****
+    input("\nPress Enter To Test Create Template API:\n")
 
-    obj.create_template()  # *****
+    obj.create_template()
 
     input("\nPress Enter To Test Get Fields API(Merged fields in document will be returned as response):\n")
 
-    print("\nInput document with merge fields: Sample_Documents/Merge_templete.docx");
+    print("Input document with merge fields: Sample_Documents/Merge_templete.docx")
 
     obj.get_fields()
 
@@ -544,9 +790,9 @@ if __name__ == "__main__":
 
     obj.merge_and_deliver_via_webhook()
 
-    input("\nPress Enter To Test Merge and Download API:\n")  # *****
+    input("\nPress Enter To Test Merge and Download API:\n")
 
-    obj.merge_and_download()  # *****
+    obj.merge_and_download()
 
     input("\nPress Enter To Test Conversion API API:\n")
 
@@ -588,14 +834,14 @@ if __name__ == "__main__":
 
     obj.preview_presentation()
 
-    input("\nPress Enter To Test Convert Presentation API:\n")  # *****
+    input("\nPress Enter To Test Convert Presentation API:\n")
 
-    obj.convert_presentation()  # *****
+    obj.convert_presentation()
 
     input("\nPress Enter To Test Delete Document API:\n")
 
-    obj.delete_document()
+    obj.delete_writer_document()
 
     input("\nPress Enter To Test Delete Session API:\n")
 
-    obj.delete_document_session()
+    obj.delete_writer_session()

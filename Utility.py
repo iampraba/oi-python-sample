@@ -231,7 +231,10 @@ class ZOIConfigUtil(object):
             elif key in config_dict and (config_dict[key] is None or config_dict[key] == ""):
                 print(key + " value is missing")
         ZOIConfigUtil.set_config_values(config_dict)
-        print(ZOIConfigUtil.config_prop_dict)
+
+        # Printing Configuration Details
+        for key in ZOIConfigUtil.config_prop_dict:
+            print("{0}: {1}".format(key, ZOIConfigUtil.config_prop_dict[key]))
 
     @staticmethod
     def get_writer_api_base_url():

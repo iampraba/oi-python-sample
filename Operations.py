@@ -44,7 +44,6 @@ class DocumentModel:
         self.isCreateTemplate = False
         self.isDocument = False
         self.isURL = False
-        self.isMergeAndDeliver = False
 
     def upload_document(self, documentName=None, pathToDocument=None):
         if self.isURL:
@@ -453,25 +452,21 @@ class GetFields(DocumentModel):
 
 class MergeAndDeliver(DocumentModel):
 
-    def __init__(self, isMergeAndDeliver):
+    def __init__(self):
         super().__init__()
-        self.isMergeAndDeliver = isMergeAndDeliver
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/merge/webhook"
 
         DocumentDefaultsHandler.set_default_merge_and_deliver_via_webhook(self)
 
     @staticmethod
     def get_instance():
-        return MergeAndDeliver(isMergeAndDeliver=True)
+        return MergeAndDeliver()
 
     def set_file_url(self, value):
         self.file_url = value
 
     def set_merge_to(self, value):
-        if self.isMergeAndDeliver:
-            self.merge_to = value
-        else:
-            print("Invalid Parameters!")
+        self.merge_to = value
 
     def set_merge_data_csv_url(self, value):
         self.merge_data_csv_url = value
@@ -486,12 +481,9 @@ class MergeAndDeliver(DocumentModel):
         self.password = value
 
     def set_webhook(self, key, value):
-        if self.isMergeAndDeliver:
-            if self.webhook is None:
-                self.webhook = dict()
-            self.webhook[key] = value
-        else:
-            print("Invalid Parameters")
+        if self.webhook is None:
+            self.webhook = dict()
+        self.webhook[key] = value
 
     def set_merge_data(self, key, value):
         if self.merge_data is None:
@@ -511,41 +503,59 @@ class MergeAndDeliver(DocumentModel):
             self.upload_document("file_content", pathToDocument)
 
     def set_bulk_webhook_settings(self, invoke_url_or_list=None, invoke_period=None):
-        if self.isMergeAndDeliver:
-            # If Settings are passed as a list with preferred settings
-            if isinstance(invoke_url_or_list, list):
-                CommonUtil.ListDictionaryUtility(invoke_url_or_list, self.callback_settings)
+        # If Settings are passed as a list with preferred settings
+        if isinstance(invoke_url_or_list, list):
+            CommonUtil.ListDictionaryUtility(invoke_url_or_list, self.callback_settings)
 
-            # If Settings are individually passed as separate arguments
-            if invoke_url_or_list is not None:
-                self.webhook["invoke_url"] = invoke_url_or_list
-            if invoke_period is not None:
-                self.webhook["invoke_period"] = invoke_period
-        else:
-            print("Invalid Parameters!")
+        # If Settings are individually passed as separate arguments
+        if invoke_url_or_list is not None:
+            self.webhook["invoke_url"] = invoke_url_or_list
+        if invoke_period is not None:
+            self.webhook["invoke_period"] = invoke_period
 
     def merge_and_deliver(self):
-        if self.isMergeAndDeliver:
-            try:
-                from Handler import ZOIAPIHandler
-            except ImportError:
-                from .Handler import ZOIAPIHandler
-            return ZOIAPIHandler.get_instance(self).writer_request_handler()
-        else:
-            print("Invalid Method Call!")
+        try:
+            from Handler import ZOIAPIHandler
+        except ImportError:
+            from .Handler import ZOIAPIHandler
+        return ZOIAPIHandler.get_instance(self).writer_request_handler()
 
 
-class MergeAndDownload(MergeAndDeliver):
+class MergeAndDownload(DocumentModel):
 
-    def __init__(self, isMergeAndDeliver):
-        super().__init__(isMergeAndDeliver)
+    def __init__(self):
+        super().__init__()
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/merge/download"
 
         DocumentDefaultsHandler.set_default_merge_and_download_settings(self)
 
     @staticmethod
     def get_instance():
-        return MergeAndDownload(isMergeAndDeliver=False)
+        return MergeAndDownload()
+
+    def set_file_url(self, value):
+        self.file_url = value
+
+    def set_merge_data_csv_url(self, value):
+        self.merge_data_csv_url = value
+
+    def set_merge_data_json_url(self, value):
+        self.merge_data_json_url = value
+
+    def set_output_format(self, value):
+        self.output_format = value
+
+    def set_password(self, value):
+        self.password = value
+
+    def set_merge_data(self, key, value):
+        if self.merge_data is None:
+            self.merge_data = dict()
+        self.merge_data[key] = value
+
+    def upload_file_content(self, pathToDocument=None):
+        if pathToDocument is not None and pathToDocument != "":
+            self.upload_document("file_content", pathToDocument)
 
     def merge_and_download(self):
         try:
@@ -748,10 +758,10 @@ class SheetShowModel(object):
             if document_id is not None:
                 self.document_info["document_id"] = document_id
 
-    def upload_document(self, documentName=None, pathToDocument=None):
+    def upload_document(self, paramName=None, pathToDocument=None):
         if self.document is None:
             self.document = dict()
-        self.document[documentName] = pathToDocument
+        self.document[paramName] = pathToDocument
 
 
 class CreateSpreadsheet(SheetShowModel):
@@ -952,18 +962,19 @@ class Delete(object):
     def set_session_id(self, value):
         self.session_id = value
 
-    def delete_document(self, document_delete_url=None):
+    def delete_writer_document(self, document_delete_url=None):
         if document_delete_url is not None:
             self.api_end_point = document_delete_url
         else:
             self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/" + self.document_id
+            print(self.api_end_point)
         try:
             from Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).delete_request_handler()
 
-    def delete_document_session(self, session_delete_url=None):
+    def delete_writer_session(self, session_delete_url=None):
         if session_delete_url is not None:
             self.api_end_point = session_delete_url
         else:
@@ -974,7 +985,7 @@ class Delete(object):
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).delete_request_handler()
 
-    def delete_sheet(self, document_delete_url=None):
+    def delete_sheet_document(self, document_delete_url=None):
         if document_delete_url is not None:
             self.api_end_point = document_delete_url
         else:
@@ -996,7 +1007,7 @@ class Delete(object):
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).delete_request_handler()
 
-    def delete_show(self, document_delete_url=None):
+    def delete_show_document(self, document_delete_url=None):
         if document_delete_url is not None:
             self.api_end_point = document_delete_url
         else:

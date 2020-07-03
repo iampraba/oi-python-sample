@@ -41,8 +41,8 @@ class APIRequest(object):
                 connector.set_file(attachments)
 
             response = connector.trigger_request()
-            cont_type = response.headers["Content-Type"]
-            if cont_type[:cont_type.index(";")] == "application/json":
+            content_type = response.headers["Content-Type"]
+            if "application/json" in content_type or "text/" in content_type:
                 return APIResponse(response, response.status_code, self.url)
             else:
                 return FileAPIResponse(response, response.status_code, self.url)

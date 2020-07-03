@@ -30,6 +30,7 @@ class APIResponse(object):
             self.process_response_data()
 
     def handle_faulty_responses(self):
+        """
         if self.status_code == APIConstants.RESPONSECODE_NO_CONTENT:
             errorMsg = APIConstants.INVALID_DATA + "-" + APIConstants.INVALID_ID_MSG
             exception = ZOIException(self.url, self.status_code, errorMsg, APIConstants.NO_CONTENT, None, errorMsg)
@@ -42,6 +43,8 @@ class APIResponse(object):
                                      responseJSON[APIConstants.MESSAGE])
             exception.message = exception.__str__()
             raise exception
+        """
+        self.response_json = self.response.json()
 
     def process_response_data(self):
         respJson = self.response_json
