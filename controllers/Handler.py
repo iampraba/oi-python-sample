@@ -53,12 +53,6 @@ class ZOIAPIHandler(APIHandler):
             if self.editor_obj.document is not None:
                 api_handler_init.request_files = self.editor_obj.document
 
-            # Used ONLY for demonstration
-            # for key in input_json.keys():
-            #     print("{0}: {1}".format(key, input_json[key]))
-            print(json.dumps(input_json, indent=4))
-            # Used ONLY for demonstration
-
             api_response = APIRequest(api_handler_init).get_api_response()
             api_response.data = self.editor_obj
             return api_response
@@ -78,12 +72,6 @@ class ZOIAPIHandler(APIHandler):
                                                                                        input_json)
             if self.editor_obj.document is not None:
                 api_handler_init.request_files = self.editor_obj.document
-
-            # Used ONLY for demonstration
-            # for key in input_json.keys():
-            #     print("{0}: {1}".format(key, input_json[key]))
-            print(json.dumps(input_json, indent=4))
-            # Used ONLY for demonstration
 
             api_response = APIRequest(api_handler_init).get_api_response()
             api_response.data = self.editor_obj
