@@ -122,7 +122,6 @@ class DocumentDefaults:
         handler_obj.callback_settings = {
             "save_format": "zdoc",
             "http_method_type": "post",
-            "retries": 0,
             "timeout": 120000
         }
 
@@ -306,7 +305,7 @@ class SheetDefaults:
         handler_obj.permissions = {
             "document.export": True,
             "document.print": True,
-            "document.edit": False
+            "document.edit": True
         }
 
     @staticmethod

@@ -1,7 +1,5 @@
 import logging
 
-from controllers.RestClient import ZOIConfigUtil
-
 
 class ZOIException(Exception):
     """
@@ -40,11 +38,8 @@ class Logger(object):
         # create formatter and add it to the handlers
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-        try:
-            log_path = ZOIConfigUtil.config_prop_dict['applicationLogFilePath']
-        except KeyError:
-            import os
-            log_path = os.path.join(os.getcwd(), 'client_library.log')
+        import os
+        log_path = os.path.join(os.getcwd(), 'client_library.log')
         file_handler = logging.FileHandler(log_path)
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)

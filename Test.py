@@ -62,7 +62,7 @@ class MyClass(object):
         try:
             config_obj = ZOIRestClient.get_instance()
 
-            config_obj.upload_configuration_file("../configurations/AppConfiguration.json")
+            config_obj.upload_configuration_file("configurations/AppConfiguration.json")
 
             config_obj.initialize()
         except ZOIException as ex:
@@ -128,7 +128,7 @@ class MyClass(object):
             edit_doc.set_callback_settings("save_format", "docx")
             edit_doc.set_callback_settings("save_url", "https://domain.com/save.php")
             edit_doc.set_callback_settings("context_info", "additional doc or user info")
-            edit_doc.upload_document("document", "files/ZohoWriter.docx")
+            edit_doc.upload_document("document", "demo/files/ZohoWriter.docx")
             # edit_doc.set_url("File URL Here")
 
             response = edit_doc.edit_document()
@@ -159,7 +159,7 @@ class MyClass(object):
             co_edit_doc.set_callback_settings("save_format", "docx")
             co_edit_doc.set_callback_settings("save_url", "https://domain.com/save.php")
             co_edit_doc.set_callback_settings("context_info", "additional doc or user info")
-            co_edit_doc.upload_document("document", "files/ZohoWriter.docx")
+            co_edit_doc.upload_document("document", "demo/files/ZohoWriter.docx")
             # co_edit_doc.set_url("File URL Here")
 
             response = co_edit_doc.co_edit_document()
@@ -182,7 +182,7 @@ class MyClass(object):
             preview_doc = PreviewDocument.get_instance()
 
             preview_doc.set_lang("en")
-            preview_doc.upload_document("document", "files/ZohoWriter.docx")
+            preview_doc.upload_document("document", "demo/files/ZohoWriter.docx")
             # preview_doc.set_url("File URL Here")
 
             response = preview_doc.preview_document()
@@ -207,7 +207,7 @@ class MyClass(object):
             watermark_doc.set_watermark_settings("type", "text")
             watermark_doc.set_watermark_settings("opacity", "0.5")
             watermark_doc.set_watermark_settings("text", "Zoho Corp.")
-            watermark_doc.upload_document("document", "files/ZohoWriter_Watermark.docx")
+            watermark_doc.upload_document("document", "demo/files/ZohoWriter_Watermark.docx")
             # watermark_doc.set_url("File URL Here")
 
             response = watermark_doc.watermark_document()
@@ -220,7 +220,7 @@ class MyClass(object):
                 MyClass.save_response_as_json_file("WatermarkDocumentError", response_json)
             elif isinstance(response, FileAPIResponse):
                 output_file_name = "watermark_" + response.file_name
-                with open("./output/" + output_file_name, "wb") as f:
+                with open("./demo/output/" + output_file_name, "wb") as f:
                     f.write(response.file_content)
                 print("\nWatermark output file saved in output folder with filename : " + output_file_name)
             else:
@@ -240,7 +240,7 @@ class MyClass(object):
             create_template.set_callback_settings("save_format", "docx")
             create_template.set_callback_settings("save_url", "https://domain.com/save.php")
             create_template.set_callback_settings("context_info", "additional doc or user info")
-            create_template.upload_document("merge_data_json_content", "files/mergedata.json")
+            create_template.upload_document("merge_data_json_content", "demo/files/mergedata.json")
 
             response = create_template.create_template()
             response_json = response.response_json
@@ -261,7 +261,7 @@ class MyClass(object):
         try:
             get_fields = GetFields.get_instance()
 
-            get_fields.upload_document("file_content", "files/ZohoWriter_MergeTemplete.docx")
+            get_fields.upload_document("file_content", "demo/files/ZohoWriter_MergeTemplete.docx")
             # get_fields.set_file_url("File URL Here")
 
             response = get_fields.get_fields()
@@ -287,9 +287,9 @@ class MyClass(object):
             merge_deliver.set_webhook("invoke_url", "https://domain.com/xyz.php")
             merge_deliver.set_webhook("invoke_period", "oncomplete")
             merge_deliver.set_merge_to("separatedoc")
-            merge_deliver.upload_document("file_content", "files/ZohoWriter_MergeTemplete.docx")
+            merge_deliver.upload_document("file_content", "demo/files/ZohoWriter_MergeTemplete.docx")
             # merge_deliver.set_file_url("File URL Here")
-            merge_deliver.upload_document("merge_data_json_content", "files/mergedata.json")
+            merge_deliver.upload_document("merge_data_json_content", "demo/files/mergedata.json")
 
             response = merge_deliver.merge_and_deliver()
             response_json = response.response_json
@@ -311,8 +311,8 @@ class MyClass(object):
             merge_download = MergeAndDownload.get_instance()
 
             merge_download.set_output_format("pdf")
-            merge_download.upload_document("file_content", "files/ZohoWriter_MergeTemplete.docx")
-            merge_download.upload_document("merge_data_json_content", "files/mergedata.json")
+            merge_download.upload_document("file_content", "demo/files/ZohoWriter_MergeTemplete.docx")
+            merge_download.upload_document("merge_data_json_content", "demo/files/mergedata.json")
 
             response = merge_download.merge_and_download()
             if isinstance(response, APIResponse):
@@ -325,7 +325,7 @@ class MyClass(object):
             elif isinstance(response, FileAPIResponse):
                 output_file_name = "conversion_" + response.file_name
                 output_file_name = output_file_name.replace("\"", "")
-                with open("./output/" + output_file_name, "wb") as f:
+                with open("./demo/output/" + output_file_name, "wb") as f:
                     f.write(response.file_content)
                 print("Merged document stored in output folder with filename : " + output_file_name)
             else:
@@ -344,7 +344,7 @@ class MyClass(object):
 
             convert_document.set_output_options("format", "docx")
             convert_document.set_output_options("document_name", "Untitled")
-            convert_document.upload_document("document", "files/ZohoWriter.docx")
+            convert_document.upload_document("document", "demo/files/ZohoWriter.docx")
             # convert_document.set_url("File URL Here")
 
             response = convert_document.convert_document()
@@ -357,7 +357,7 @@ class MyClass(object):
                 MyClass.save_response_as_json_file("ConvertDocumentError", response_json)
             elif isinstance(response, FileAPIResponse):
                 output_file_name = "conversion_" + response.file_name
-                with open("./output/" + output_file_name, "wb") as f:
+                with open("./demo/output/" + output_file_name, "wb") as f:
                     f.write(response.file_content)
                 print("Converted document stored in output folder with filename : " + output_file_name)
             else:
@@ -374,9 +374,9 @@ class MyClass(object):
         try:
             compare_document = CompareDocuments.get_instance()
 
-            compare_document.upload_document("document1", "files/CompareDocument1.docx")
+            compare_document.upload_document("document1", "demo/files/CompareDocument1.docx")
             # compare_document.set_url1("File URL Here")
-            compare_document.upload_document("document2", "files/CompareDocument2.docx")
+            compare_document.upload_document("document2", "demo/files/CompareDocument2.docx")
             # compare_document.set_url2("File URL Here")
             compare_document.set_title("Doc1_and_Doc2")
             # compare_document.set_lang("en")
@@ -428,7 +428,7 @@ class MyClass(object):
             edit_sheet.set_callback_settings("save_format", "xlsx")
             edit_sheet.set_callback_settings("save_url", "https://zylker.com/save.php")
             edit_sheet.set_callback_settings("context_info", "additional doc or user info")
-            edit_sheet.upload_document("document", "files/ZohoSheet.xlsx")
+            edit_sheet.upload_document("document", "demo/files/ZohoSheet.xlsx")
 
             response = edit_sheet.edit_spreadsheet()
             response_json = response.response_json
@@ -454,7 +454,7 @@ class MyClass(object):
             co_edit_sheet.set_callback_settings("save_format", "xlsx")
             co_edit_sheet.set_callback_settings("save_url", "https://zylker.com/save.php")
             co_edit_sheet.set_callback_settings("context_info", "additional doc or user info")
-            co_edit_sheet.upload_document("document", "files/ZohoSheet.xlsx")
+            co_edit_sheet.upload_document("document", "demo/files/ZohoSheet.xlsx")
             # co_edit_sheet.set_url("")
 
             response = co_edit_sheet.co_edit_spreadsheet()
@@ -477,7 +477,7 @@ class MyClass(object):
             preview_sheet = PreviewSpreadsheet.get_instance()
 
             preview_sheet.set_url("https://file-examples-com.github.io/uploads/2017/02/file_example_XLSX_5000.xlsx")
-            # preview_sheet.upload_document("document", "files/ZohoSheet.xlsx")
+            # preview_sheet.upload_document("document", "demo/files/ZohoSheet.xlsx")
 
             response = preview_sheet.preview_spreadsheet()
             response_json = response.response_json
@@ -527,7 +527,7 @@ class MyClass(object):
             edit_show.set_document_info("document_id", MyClass.collaboration_document_id)
             edit_show.set_callback_settings("save_url", "https://domain.com/save.php")
             edit_show.set_callback_settings("context_info", "additional doc or user info")
-            edit_show.upload_document("document", "files/ZohoShow.pptx")
+            edit_show.upload_document("document", "demo/files/ZohoShow.pptx")
 
             response = edit_show.edit_presentation()
             response_json = response.response_json
@@ -554,7 +554,7 @@ class MyClass(object):
             co_edit_show.set_document_info("document_id", MyClass.collaboration_document_id)
             co_edit_show.set_callback_settings("save_url", "https://domain.com/save.php")
             co_edit_show.set_callback_settings("context_info", "additional doc or user info")
-            co_edit_show.upload_document("document", "files/ZohoShow.pptx")
+            co_edit_show.upload_document("document", "demo/files/ZohoShow.pptx")
 
             response = co_edit_show.co_edit_presentation()
             response_json = response.response_json
@@ -575,7 +575,7 @@ class MyClass(object):
         try:
             preview_show = PreviewPresentation.get_instance()
 
-            preview_show.upload_document("document", "files/ZohoShow.pptx")
+            preview_show.upload_document("document", "demo/files/ZohoShow.pptx")
 
             response = preview_show.preview_presentation()
             response_json = response.response_json
@@ -596,7 +596,7 @@ class MyClass(object):
         try:
             convert_show = ConvertPresentation.get_instance()
 
-            convert_show.upload_document("document", "files/ZohoShow.pptx")
+            convert_show.upload_document("document", "demo/files/ZohoShow.pptx")
             convert_show.set_format("pdf")
 
             response = convert_show.convert_presentation()
@@ -610,7 +610,7 @@ class MyClass(object):
             elif isinstance(response, FileAPIResponse):
                 output_file_name = "conversion_" + response.file_name
                 output_file_name = output_file_name.replace("\"", "")
-                with open("./output/" + output_file_name, "wb") as f:
+                with open("./demo/output/" + output_file_name, "wb") as f:
                     f.write(response.file_content)
                 print("Converted document stored in output folder with filename : " + output_file_name)
             else:
@@ -825,7 +825,7 @@ class MyClass(object):
     @staticmethod
     def save_response_as_json_file(api_name, response_json):  # Just to save response as JSON file in output folder
         import json
-        with open("./api_response/" + api_name + "_response.json", "w") as f:
+        with open("./demo/api_response/" + api_name + "_response.json", "w") as f:
             json.dump(response_json, f, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 
@@ -868,7 +868,7 @@ if __name__ == "__main__":
 
     input("\nPress Enter To Test Get Fields API(Merged fields in document will be returned as response):\n")
 
-    print("Input document with merge fields: files/ZohoWriter_MergeTemplete.docx")
+    print("Input document with merge fields: demo/files/ZohoWriter_MergeTemplete.docx")
 
     obj.get_fields()
 
