@@ -1,0 +1,1 @@
+API response will be saved in this folder as JSON file.
