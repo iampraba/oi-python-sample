@@ -825,7 +825,7 @@ class MyClass(object):
     @staticmethod
     def save_response_as_json_file(api_name, response_json):  # Just to save response as JSON file in output folder
         import json
-        with open("./demo/api_response/" + api_name + "_response.json", "w") as f:
+        with open("demo/api_response/" + api_name + "_response.json", "w") as f:
             json.dump(response_json, f, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 
