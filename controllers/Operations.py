@@ -1,6 +1,5 @@
-
-from Handler import DocumentDefaultsHandler, SheetDefaultsHandler, ShowDefaultsHandler
-from Utility import CommonUtil, ZOIConfigUtil
+from controllers.RestClient import ZOIConfigUtil
+from controllers.Utility import CommonUtil, DocumentDefaults, SheetDefaults, ShowDefaults
 
 
 class DocumentModel:
@@ -19,6 +18,7 @@ class DocumentModel:
         self.watermark_settings = None
         self.merge_data = None
         self.webhook = None
+        self.output_options = None
 
         # Universal Attachments Holder
         self.document = None
@@ -45,31 +45,31 @@ class DocumentModel:
         self.isDocument = False
         self.isURL = False
 
-    def upload_document(self, documentName=None, pathToDocument=None):
+    def upload_document(self, document_name=None, path_to_document=None):
         if self.isURL:
             self.isURL = False
             self.url = None
         self.isDocument = True
         if self.document is None:
             self.document = dict()
-        self.document[documentName] = pathToDocument
+        self.document[document_name] = path_to_document
 
 
 class CreateDocument(DocumentModel):
 
-    def __init__(self, isCreate):
+    def __init__(self, is_create):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document"
 
-        self.isCreate = isCreate
+        self.isCreate = is_create
 
         # Initializing parameters with Defaults
         if self.isCreate and not self.isCreateTemplate:
-            DocumentDefaultsHandler.set_default_create_document_settings(self)
+            DocumentDefaults.set_default_create_document_settings(self)
 
     @staticmethod
     def get_instance():
-        return CreateDocument(isCreate=True)
+        return CreateDocument(is_create=True)
 
     def set_callback_settings(self, key, value):
         if self.callback_settings is None:
@@ -89,7 +89,7 @@ class CreateDocument(DocumentModel):
     def set_permissions(self, key, value):
         if self.permissions is None:
             self.permissions = dict()
-        self.permissions[key] = CommonUtil.TrueFalseUtility(value)
+        self.permissions[key] = CommonUtil.true_false_utility(value)
 
     def set_document_info(self, key, value):
         if self.document_info is None:
@@ -107,32 +107,39 @@ class CreateDocument(DocumentModel):
                 self.ui_options = dict()
             self.ui_options[key] = value
 
-    def set_bulk_callback_settings(self, save_format_or_list=None, save_url=None, context_info=None):
+    def set_bulk_callback_settings(self, save_format_or_dict=None, save_url=None, http_method_type=None, retries=None,
+                                   timeout=None, save_url_params=None):
 
         # If Settings are passed as a list with preferred settings
-        if isinstance(save_format_or_list, list):
-            CommonUtil.ListDictionaryUtility(save_format_or_list, self.callback_settings)
+        if isinstance(save_format_or_dict, dict):
+            self.callback_settings = save_format_or_dict
 
         # If Settings are individually passed as separate arguments
         else:
-            if save_format_or_list is not None:
-                self.callback_settings["save_format"] = save_format_or_list
+            if save_format_or_dict is not None:
+                self.callback_settings["save_format"] = save_format_or_dict
             if save_url is not None:
                 self.callback_settings["save_url"] = save_url
-            if context_info is not None:
-                self.callback_settings["context_info"] = context_info
+            if http_method_type is not None:
+                self.callback_settings["http_method_type"] = http_method_type
+            if retries is not None:
+                self.callback_settings["retries"] = retries
+            if timeout is not None:
+                self.callback_settings["timeout"] = timeout
+            if save_url_params is not None:
+                self.callback_settings["save_url_params"] = save_url_params
 
-    def set_bulk_document_defaults(self, orientation_or_track_changes_or_list=None, paper_size=None, font_name=None,
+    def set_bulk_document_defaults(self, orientation_or_dict=None, paper_size=None, font_name=None,
                                    font_size=None, track_changes=None, margin=None):
         if self.isCreate:
             # If Settings are passed as a list with preferred settings
-            if isinstance(orientation_or_track_changes_or_list, list):
-                CommonUtil.ListDictionaryUtility(orientation_or_track_changes_or_list, self.document_defaults)
+            if isinstance(orientation_or_dict, dict):
+                self.document_defaults = orientation_or_dict
 
             # If Settings are individually passed as separate arguments
             else:
-                if orientation_or_track_changes_or_list is not None:
-                    self.document_defaults["orientation"] = orientation_or_track_changes_or_list
+                if orientation_or_dict is not None:
+                    self.document_defaults["orientation"] = orientation_or_dict
                 if paper_size is not None:
                     self.document_defaults["paper_size"] = paper_size
                 if font_name is not None:
@@ -145,93 +152,93 @@ class CreateDocument(DocumentModel):
                     for margin_value, dict_key in zip(margin, self.document_defaults["margin"].keys()):
                         self.document_defaults["margin"][dict_key] = margin_value
 
-    def set_bulk_editor_settings(self, unit_or_list=None, language=None, view=None):
+    def set_bulk_editor_settings(self, unit_or_dict=None, language=None, view=None):
 
         # If Settings are passed as a list with preferred settings
-        if isinstance(unit_or_list, list):
-            CommonUtil.ListDictionaryUtility(unit_or_list, self.editor_settings)
+        if isinstance(unit_or_dict, dict):
+            self.editor_settings = unit_or_dict
 
         # If Settings are individually passed as separate arguments
         else:
-            if unit_or_list is not None:
-                self.editor_settings["unit"] = unit_or_list
+            if unit_or_dict is not None:
+                self.editor_settings["unit"] = unit_or_dict
             if language is not None:
                 self.editor_settings["language"] = language
             if view is not None:
                 self.editor_settings["view"] = view
 
-    def set_bulk_permissions(self, document_export_or_list=None, document_print=None, document_edit=None,
+    def set_bulk_permissions(self, document_export_or_dict=None, document_print=None, document_edit=None,
                              review_changes_resolve=None, review_comment=None, collab_chat=None,
                              document_pausecollaboration=None, document_fill=None):
 
         # If Settings are passed as a list with preferred settings
-        if isinstance(document_export_or_list, list):
-            CommonUtil.ListDictionaryUtility(document_export_or_list, self.permissions)
+        if isinstance(document_export_or_dict, dict):
+            self.permissions = document_export_or_dict
 
         # If Settings are individually passed as separate arguments
         else:
-            if document_export_or_list is not None:
-                self.permissions["document.export"] = CommonUtil.TrueFalseUtility(document_export_or_list)
+            if document_export_or_dict is not None:
+                self.permissions["document.export"] = CommonUtil.true_false_utility(document_export_or_dict)
             if document_print is not None:
-                self.permissions["document.print"] = CommonUtil.TrueFalseUtility(document_print)
+                self.permissions["document.print"] = CommonUtil.true_false_utility(document_print)
             if document_edit is not None:
-                self.permissions["document.edit"] = CommonUtil.TrueFalseUtility(document_edit)
+                self.permissions["document.edit"] = CommonUtil.true_false_utility(document_edit)
             if review_changes_resolve is not None:
-                self.permissions["review.changes.resolve"] = CommonUtil.TrueFalseUtility(review_changes_resolve)
+                self.permissions["review.changes.resolve"] = CommonUtil.true_false_utility(review_changes_resolve)
             if review_comment is not None:
-                self.permissions["review.comment"] = CommonUtil.TrueFalseUtility(review_comment)
+                self.permissions["review.comment"] = CommonUtil.true_false_utility(review_comment)
             if collab_chat is not None:
-                self.permissions["collab.chat"] = CommonUtil.TrueFalseUtility(collab_chat)
+                self.permissions["collab.chat"] = CommonUtil.true_false_utility(collab_chat)
             if document_pausecollaboration is not None:
-                self.permissions["document.pausecollaboration"] = CommonUtil.TrueFalseUtility(
+                self.permissions["document.pausecollaboration"] = CommonUtil.true_false_utility(
                     document_pausecollaboration)
             if document_fill is not None:
-                self.permissions["document.fill"] = CommonUtil.TrueFalseUtility(document_fill)
+                self.permissions["document.fill"] = CommonUtil.true_false_utility(document_fill)
 
-    def set_bulk_document_info(self, document_name_or_list=None, document_id=None):
+    def set_bulk_document_info(self, document_name_or_dict=None, document_id=None):
 
         # If Settings are passed as a list with preferred settings
-        if isinstance(document_name_or_list, list):
-            CommonUtil.ListDictionaryUtility(document_name_or_list, self.document_info)
+        if isinstance(document_name_or_dict, dict):
+            self.document_info = document_name_or_dict
 
         # If Settings are individually passed as separate arguments
         else:
-            if document_name_or_list is not None:
-                self.document_info["document_name"] = document_name_or_list
+            if document_name_or_dict is not None:
+                self.document_info["document_name"] = document_name_or_dict
             if document_id is not None:
                 self.document_info["document_id"] = document_id
 
-    def set_bulk_user_info(self, user_id_or_list, display_name):
+    def set_bulk_user_info(self, user_id_or_dict, display_name):
 
         # If Settings are passed as a list with preferred settings
-        if isinstance(user_id_or_list, list):
-            CommonUtil.ListDictionaryUtility(user_id_or_list, self.user_info)
+        if isinstance(user_id_or_dict, dict):
+            self.user_info = user_id_or_dict
 
         # If Settings are individually passed as separate arguments
         else:
-            if user_id_or_list is not None:
-                self.user_info["user_id"] = user_id_or_list
+            if user_id_or_dict is not None:
+                self.user_info["user_id"] = user_id_or_dict
             if display_name is not None:
                 self.user_info["display_name"] = display_name
 
-    def set_bulk_ui_options(self, save_button_or_list=None, chat_panel=None):
+    def set_bulk_ui_options(self, save_button_or_dict=None, chat_panel=None):
 
         if not self.isCreateTemplate:
             # If Settings are passed as a list with preferred settings
-            if isinstance(save_button_or_list, list):
-                CommonUtil.ListDictionaryUtility(save_button_or_list, self.ui_options)
+            if isinstance(save_button_or_dict, dict):
+                self.ui_options = save_button_or_dict
 
             # If Settings are individually passed as separate arguments
             else:
-                if save_button_or_list is not None:
-                    self.ui_options["save_button"] = save_button_or_list
+                if save_button_or_dict is not None:
+                    self.ui_options["save_button"] = save_button_or_dict
                 if chat_panel is not None:
                     self.ui_options["chat_panel"] = None
 
     def create_document(self):
         if not self.isCreateTemplate:
             try:
-                from Handler import ZOIAPIHandler
+                from controllers.Handler import ZOIAPIHandler
             except ImportError:
                 from .Handler import ZOIAPIHandler
 
@@ -241,10 +248,10 @@ class CreateDocument(DocumentModel):
 class EditDocument(CreateDocument):
 
     def __init__(self):
-        super().__init__(isCreate=False)
+        super().__init__(is_create=False)
 
         # Initializing parameters with Defaults
-        DocumentDefaultsHandler.set_default_edit_document_settings(self)
+        DocumentDefaults.set_default_edit_document_settings(self)
 
     @staticmethod
     def get_instance():
@@ -259,7 +266,7 @@ class EditDocument(CreateDocument):
 
     def edit_document(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         if self.isDocument or self.isURL:
@@ -267,9 +274,9 @@ class EditDocument(CreateDocument):
         else:
             return "No Supported Document Uploaded to edit!"
 
-    def upload_edit_document(self, pathToDocument=None):
-        if pathToDocument is not None and pathToDocument != "":
-            self.upload_document("document", pathToDocument)
+    def upload_edit_document(self, path_to_document=None):
+        if path_to_document is not None and path_to_document != "":
+            self.upload_document("document", path_to_document)
 
 
 class CoEditDocument(EditDocument):
@@ -283,7 +290,7 @@ class CoEditDocument(EditDocument):
 
     def co_edit_document(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         if self.isDocument or self.isURL:
@@ -298,7 +305,7 @@ class PreviewDocument(DocumentModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/preview"
 
-        DocumentDefaultsHandler.set_default_preview_document_settings(self)
+        DocumentDefaults.set_default_preview_document_settings(self)
 
     @staticmethod
     def get_instance():
@@ -315,7 +322,7 @@ class PreviewDocument(DocumentModel):
 
     def preview_document(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         if self.isDocument or self.isURL:
@@ -323,9 +330,9 @@ class PreviewDocument(DocumentModel):
         else:
             return "No Supported Document Uploaded to edit!"
 
-    def upload_preview_document(self, pathToDocument=None):
-        if pathToDocument is not None and pathToDocument != "":
-            self.upload_document("document", pathToDocument)
+    def upload_preview_document(self, path_to_document=None):
+        if path_to_document is not None and path_to_document != "":
+            self.upload_document("document", path_to_document)
 
 
 class WatermarkDocument(DocumentModel):
@@ -334,7 +341,7 @@ class WatermarkDocument(DocumentModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/watermark"
 
-        DocumentDefaultsHandler.set_default_watermark_settings(self)
+        DocumentDefaults.set_default_watermark_settings(self)
 
     @staticmethod
     def get_instance():
@@ -351,16 +358,16 @@ class WatermarkDocument(DocumentModel):
             self.watermark_settings = dict()
         self.watermark_settings[key] = value
 
-    def set_bulk_watermark_settings(self, text_or_list=None, text_type=None, orientation=None, font_name=None,
+    def set_bulk_watermark_settings(self, text_or_dict=None, text_type=None, orientation=None, font_name=None,
                                     font_size=None, font_color=None, opacity=None):
 
         # If Settings are passed as a list with preferred settings
-        if isinstance(text_or_list, list):
-            CommonUtil.ListDictionaryUtility(text_or_list, self.callback_settings)
+        if isinstance(text_or_dict, dict):
+            self.watermark_settings = text_or_dict
 
         # If Settings are individually passed as separate arguments
-        if text_or_list is not None:
-            self.watermark_settings["text"] = text_or_list
+        if text_or_dict is not None:
+            self.watermark_settings["text"] = text_or_dict
         if text_type is not None:
             self.watermark_settings["type"] = text_type
         if orientation is not None:
@@ -376,7 +383,7 @@ class WatermarkDocument(DocumentModel):
 
     def watermark_document(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         if self.isDocument or self.isURL:
@@ -384,19 +391,19 @@ class WatermarkDocument(DocumentModel):
         else:
             return "No Supported Document Uploaded to edit!"
 
-    def upload_watermark_document(self, pathToDocument=None):
-        if pathToDocument is not None and pathToDocument != "":
-            self.upload_document("document", pathToDocument)
+    def upload_watermark_document(self, path_to_document=None):
+        if path_to_document is not None and path_to_document != "":
+            self.upload_document("document", path_to_document)
 
 
 class CreateTemplate(CreateDocument):
 
     def __init__(self):
-        super().__init__(isCreate=False)
+        super().__init__(is_create=False)
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "template"
         self.isCreateTemplate = True
 
-        DocumentDefaultsHandler.set_default_create_template_settings(self)
+        DocumentDefaults.set_default_create_template_settings(self)
 
     @staticmethod
     def get_instance():
@@ -407,22 +414,22 @@ class CreateTemplate(CreateDocument):
 
     def create_template(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).writer_request_handler()
 
-    def upload_merge_data_csv_content(self, pathToDocument=None):
-        if pathToDocument is not None and pathToDocument != "":
-            self.upload_document("merge_data_csv_content", pathToDocument)
+    def upload_merge_data_csv_content(self, path_to_document=None):
+        if path_to_document is not None and path_to_document != "":
+            self.upload_document("merge_data_csv_content", path_to_document)
 
-    def upload_merge_data_json_content(self, pathToDocument=None):
-        if pathToDocument is not None and pathToDocument != "":
-            self.upload_document("merge_data_json_content", pathToDocument)
+    def upload_merge_data_json_content(self, path_to_document=None):
+        if path_to_document is not None and path_to_document != "":
+            self.upload_document("merge_data_json_content", path_to_document)
 
-    def upload_template_document(self, pathToDocument=None):
-        if pathToDocument is not None and pathToDocument != "":
-            self.upload_document("document", pathToDocument)
+    def upload_template_document(self, path_to_document=None):
+        if path_to_document is not None and path_to_document != "":
+            self.upload_document("document", path_to_document)
 
 
 class GetFields(DocumentModel):
@@ -440,14 +447,14 @@ class GetFields(DocumentModel):
 
     def get_fields(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).writer_request_handler()
 
-    def upload_file_content(self, pathToDocument=None):
-        if pathToDocument is not None and pathToDocument != "":
-            self.upload_document("file_content", pathToDocument)
+    def upload_file_content(self, path_to_document=None):
+        if path_to_document is not None and path_to_document != "":
+            self.upload_document("file_content", path_to_document)
 
 
 class MergeAndDeliver(DocumentModel):
@@ -456,7 +463,7 @@ class MergeAndDeliver(DocumentModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/merge/webhook"
 
-        DocumentDefaultsHandler.set_default_merge_and_deliver_via_webhook(self)
+        DocumentDefaults.set_default_merge_and_deliver_via_webhook(self)
 
     @staticmethod
     def get_instance():
@@ -492,30 +499,30 @@ class MergeAndDeliver(DocumentModel):
 
     def get_fields(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         if self.isDocument or self.isURL:
             return ZOIAPIHandler.get_instance(self).writer_request_handler()
 
-    def upload_file_content(self, pathToDocument=None):
-        if pathToDocument is not None and pathToDocument != "":
-            self.upload_document("file_content", pathToDocument)
+    def upload_file_content(self, path_to_document=None):
+        if path_to_document is not None and path_to_document != "":
+            self.upload_document("file_content", path_to_document)
 
-    def set_bulk_webhook_settings(self, invoke_url_or_list=None, invoke_period=None):
+    def set_bulk_webhook_settings(self, invoke_url_or_dict=None, invoke_period=None):
         # If Settings are passed as a list with preferred settings
-        if isinstance(invoke_url_or_list, list):
-            CommonUtil.ListDictionaryUtility(invoke_url_or_list, self.callback_settings)
+        if isinstance(invoke_url_or_dict, dict):
+            self.webhook = invoke_url_or_dict
 
         # If Settings are individually passed as separate arguments
-        if invoke_url_or_list is not None:
-            self.webhook["invoke_url"] = invoke_url_or_list
+        if invoke_url_or_dict is not None:
+            self.webhook["invoke_url"] = invoke_url_or_dict
         if invoke_period is not None:
             self.webhook["invoke_period"] = invoke_period
 
     def merge_and_deliver(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).writer_request_handler()
@@ -527,7 +534,7 @@ class MergeAndDownload(DocumentModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/merge/download"
 
-        DocumentDefaultsHandler.set_default_merge_and_download_settings(self)
+        DocumentDefaults.set_default_merge_and_download_settings(self)
 
     @staticmethod
     def get_instance():
@@ -553,13 +560,13 @@ class MergeAndDownload(DocumentModel):
             self.merge_data = dict()
         self.merge_data[key] = value
 
-    def upload_file_content(self, pathToDocument=None):
-        if pathToDocument is not None and pathToDocument != "":
-            self.upload_document("file_content", pathToDocument)
+    def upload_file_content(self, path_to_document=None):
+        if path_to_document is not None and path_to_document != "":
+            self.upload_document("file_content", path_to_document)
 
     def merge_and_download(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).writer_request_handler()
@@ -571,14 +578,11 @@ class ConvertDocument(DocumentModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/convert"
 
-        DocumentDefaultsHandler.set_default_convert_document_settings(self)
+        DocumentDefaults.set_default_convert_document_settings(self)
 
     @staticmethod
     def get_instance():
         return ConvertDocument()
-
-    def set_format(self, value):
-        self.format = value
 
     def set_url(self, value):
         if self.isDocument:
@@ -586,13 +590,37 @@ class ConvertDocument(DocumentModel):
         self.isURL = True
         self.url = value
 
-    def upload_document_to_convert(self, pathToDocument):
-        if pathToDocument is not None and pathToDocument != "":
-            self.upload_document("document", pathToDocument)
+    def upload_document_to_convert(self, path_to_document):
+        if path_to_document is not None and path_to_document != "":
+            self.upload_document("document", path_to_document)
+
+    def set_output_options(self, key, value):
+        if self.output_options is None:
+            self.output_options = dict()
+        self.output_options[key] = value
+
+    def set_bulk_output_options(self, format_or_dict=None, document_name=None, password=None, include_changes=None,
+                                include_comments=None):
+
+        # If Settings are passed as a list with preferred settings
+        if isinstance(format_or_dict, dict):
+            self.output_options = format_or_dict
+
+        # If Settings are individually passed as separate arguments
+        if format_or_dict is not None:
+            self.output_options["format"] = format_or_dict
+        if document_name is not None:
+            self.output_options["document_name"] = document_name
+        if password is not None:
+            self.output_options["password"] = password
+        if include_changes is not None:
+            self.output_options["include_changes"] = include_changes
+        if include_comments is not None:
+            self.output_options["include_comments"] = include_comments
 
     def convert_document(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         if self.isDocument or self.isURL:
@@ -605,7 +633,7 @@ class CompareDocuments(DocumentModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/compare"
 
-        DocumentDefaultsHandler.set_default_compare_document_settings(self)
+        DocumentDefaults.set_default_compare_document_settings(self)
 
     @staticmethod
     def get_instance():
@@ -623,17 +651,17 @@ class CompareDocuments(DocumentModel):
     def set_lang(self, value):
         self.lang = value
 
-    def upload_document1(self, pathToDocument):
-        if pathToDocument is not None and pathToDocument != "":
-            self.upload_document("document1", pathToDocument)
+    def upload_document1(self, path_to_document):
+        if path_to_document is not None and path_to_document != "":
+            self.upload_document("document1", path_to_document)
 
-    def upload_document2(self, pathToDocument):
-        if pathToDocument is not None and pathToDocument != "":
-            self.upload_document("document2", pathToDocument)
+    def upload_document2(self, path_to_document):
+        if path_to_document is not None and path_to_document != "":
+            self.upload_document("document2", path_to_document)
 
     def compare_documents(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).writer_request_handler()
@@ -677,7 +705,7 @@ class SheetShowModel(object):
     def set_permissions(self, key, value):
         if self.permissions is None:
             self.permissions = dict()
-        self.permissions[key] = CommonUtil.TrueFalseUtility(value)
+        self.permissions[key] = CommonUtil.true_false_utility(value)
 
     def set_document_info(self, key, value):
         if self.document_info is None:
@@ -702,66 +730,66 @@ class SheetShowModel(object):
     def set_format(self, value):
         self.format = value
 
-    def set_bulk_callback_settings(self, save_format_or_list=None, save_url=None, context_info=None):
+    def set_bulk_callback_settings(self, save_format_or_dict=None, save_url=None, context_info=None):
 
         # If Settings are passed as a list with preferred settings
-        if isinstance(save_format_or_list, list):
-            CommonUtil.ListDictionaryUtility(save_format_or_list, self.callback_settings)
+        if isinstance(save_format_or_dict, dict):
+            self.callback_settings = save_format_or_dict
 
         # If Settings are individually passed as separate arguments
         else:
-            if save_format_or_list is not None:
-                self.callback_settings["save_format"] = save_format_or_list
+            if save_format_or_dict is not None:
+                self.callback_settings["save_format"] = save_format_or_dict
             if save_url is not None:
                 self.callback_settings["save_url"] = save_url
             if context_info is not None:
                 self.callback_settings["context_info"] = context_info
 
-    def set_bulk_editor_settings(self, language_or_list=None, country=None):
+    def set_bulk_editor_settings(self, language_or_dict=None, country=None):
 
         # If Settings are passed as a list with preferred settings
-        if isinstance(language_or_list, list):
-            CommonUtil.ListDictionaryUtility(language_or_list, self.editor_settings)
+        if isinstance(language_or_dict, dict):
+            self.editor_settings = language_or_dict
 
         # If Settings are individually passed as separate arguments
         else:
-            if language_or_list is not None:
-                self.editor_settings["language"] = language_or_list
+            if language_or_dict is not None:
+                self.editor_settings["language"] = language_or_dict
             if country is not None:
                 self.editor_settings["country"] = country
 
-    def set_bulk_permissions(self, document_export_or_list=None, document_print=None, document_edit=None):
+    def set_bulk_permissions(self, document_export_or_dict=None, document_print=None, document_edit=None):
 
         # If Settings are passed as a list with preferred settings
-        if isinstance(document_export_or_list, list):
-            CommonUtil.ListDictionaryUtility(document_export_or_list, self.permissions)
+        if isinstance(document_export_or_dict, dict):
+            self.permissions = document_export_or_dict
 
         # If Settings are individually passed as separate arguments
         else:
-            if document_export_or_list is not None:
-                self.permissions["document.export"] = CommonUtil.TrueFalseUtility(document_export_or_list)
+            if document_export_or_dict is not None:
+                self.permissions["document.export"] = CommonUtil.true_false_utility(document_export_or_dict)
             if document_print is not None:
-                self.permissions["document.print"] = CommonUtil.TrueFalseUtility(document_print)
+                self.permissions["document.print"] = CommonUtil.true_false_utility(document_print)
             if document_edit is not None:
-                self.permissions["document.edit"] = CommonUtil.TrueFalseUtility(document_edit)
+                self.permissions["document.edit"] = CommonUtil.true_false_utility(document_edit)
 
-    def set_bulk_document_info(self, document_name_or_list=None, document_id=None):
+    def set_bulk_document_info(self, document_name_or_dict=None, document_id=None):
 
         # If Settings are passed as a list with preferred settings
-        if isinstance(document_name_or_list, list):
-            CommonUtil.ListDictionaryUtility(document_name_or_list, self.document_info)
+        if isinstance(document_name_or_dict, dict):
+            self.document_info = document_name_or_dict
 
         # If Settings are individually passed as separate arguments
         else:
-            if document_name_or_list is not None:
-                self.document_info["document_name"] = document_name_or_list
+            if document_name_or_dict is not None:
+                self.document_info["document_name"] = document_name_or_dict
             if document_id is not None:
                 self.document_info["document_id"] = document_id
 
-    def upload_document(self, paramName=None, pathToDocument=None):
+    def upload_document(self, param_name=None, path_to_document=None):
         if self.document is None:
             self.document = dict()
-        self.document[paramName] = pathToDocument
+        self.document[param_name] = path_to_document
 
 
 class CreateSpreadsheet(SheetShowModel):
@@ -770,7 +798,7 @@ class CreateSpreadsheet(SheetShowModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_sheet_api_base_url() + "spreadsheet"
 
-        SheetDefaultsHandler.set_default_create_spreadsheet_settings(self)
+        SheetDefaults.set_default_create_spreadsheet_settings(self)
 
     @staticmethod
     def get_instance():
@@ -778,7 +806,7 @@ class CreateSpreadsheet(SheetShowModel):
 
     def create_spreadsheet(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).sheet_show_request_handler()
@@ -790,7 +818,7 @@ class EditSpreadsheet(SheetShowModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_sheet_api_base_url() + "spreadsheet"
 
-        SheetDefaultsHandler.set_default_edit_spreadsheet_settings(self)
+        SheetDefaults.set_default_edit_spreadsheet_settings(self)
 
     @staticmethod
     def get_instance():
@@ -798,7 +826,7 @@ class EditSpreadsheet(SheetShowModel):
 
     def edit_spreadsheet(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).sheet_show_request_handler()
@@ -810,7 +838,7 @@ class CoEditSpreadsheet(SheetShowModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_sheet_api_base_url() + "spreadsheet"
 
-        SheetDefaultsHandler.set_default_co_edit_spreadsheet_settings(self)
+        SheetDefaults.set_default_co_edit_spreadsheet_settings(self)
 
     @staticmethod
     def get_instance():
@@ -818,7 +846,7 @@ class CoEditSpreadsheet(SheetShowModel):
 
     def co_edit_spreadsheet(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).sheet_show_request_handler()
@@ -830,7 +858,7 @@ class PreviewSpreadsheet(SheetShowModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_sheet_api_base_url() + "spreadsheet/preview"
 
-        SheetDefaultsHandler.set_default_preview_spreadsheet_settings(self)
+        SheetDefaults.set_default_preview_spreadsheet_settings(self)
 
     @staticmethod
     def get_instance():
@@ -838,7 +866,7 @@ class PreviewSpreadsheet(SheetShowModel):
 
     def preview_spreadsheet(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).sheet_show_request_handler()
@@ -850,7 +878,7 @@ class CreatePresentation(SheetShowModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_show_api_base_url() + "presentation"
 
-        ShowDefaultsHandler.set_default_create_presentation_settings(self)
+        ShowDefaults.set_default_create_presentation_settings(self)
 
     @staticmethod
     def get_instance():
@@ -858,7 +886,7 @@ class CreatePresentation(SheetShowModel):
 
     def create_presentation(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).sheet_show_request_handler()
@@ -870,7 +898,7 @@ class EditPresentation(SheetShowModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_show_api_base_url() + "presentation"
 
-        ShowDefaultsHandler.set_default_edit_presentation_settings(self)
+        ShowDefaults.set_default_edit_presentation_settings(self)
 
     @staticmethod
     def get_instance():
@@ -878,7 +906,7 @@ class EditPresentation(SheetShowModel):
 
     def edit_presentation(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).sheet_show_request_handler()
@@ -890,7 +918,7 @@ class CoEditPresentation(SheetShowModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_show_api_base_url() + "presentation"
 
-        ShowDefaultsHandler.set_default_co_edit_presentation_settings(self)
+        ShowDefaults.set_default_co_edit_presentation_settings(self)
 
     @staticmethod
     def get_instance():
@@ -898,7 +926,7 @@ class CoEditPresentation(SheetShowModel):
 
     def co_edit_presentation(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).sheet_show_request_handler()
@@ -910,7 +938,7 @@ class PreviewPresentation(SheetShowModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_show_api_base_url() + "presentation/preview"
 
-        ShowDefaultsHandler.set_default_preview_presentation_settings(self)
+        ShowDefaults.set_default_preview_presentation_settings(self)
 
     @staticmethod
     def get_instance():
@@ -918,7 +946,7 @@ class PreviewPresentation(SheetShowModel):
 
     def preview_presentation(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).sheet_show_request_handler()
@@ -930,7 +958,7 @@ class ConvertPresentation(SheetShowModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_show_api_base_url() + "presentation/convert"
 
-        ShowDefaultsHandler.set_default_conversion_api_settings(self)
+        ShowDefaults.set_default_conversion_api_settings(self)
 
     @staticmethod
     def get_instance():
@@ -938,7 +966,7 @@ class ConvertPresentation(SheetShowModel):
 
     def convert_presentation(self):
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).sheet_show_request_handler()
@@ -969,7 +997,7 @@ class Delete(object):
             self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/" + self.document_id
             print(self.api_end_point)
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).delete_request_handler()
@@ -980,7 +1008,7 @@ class Delete(object):
         else:
             self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "session/" + self.session_id
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).delete_request_handler()
@@ -991,7 +1019,7 @@ class Delete(object):
         else:
             self.api_end_point = ZOIConfigUtil.get_sheet_api_base_url() + "spreadsheet/" + self.document_id
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).delete_request_handler()
@@ -1002,7 +1030,7 @@ class Delete(object):
         else:
             self.api_end_point = ZOIConfigUtil.get_sheet_api_base_url() + "session/" + self.session_id
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).delete_request_handler()
@@ -1013,7 +1041,7 @@ class Delete(object):
         else:
             self.api_end_point = ZOIConfigUtil.get_show_api_base_url() + "presentation/" + self.document_id
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).delete_request_handler()
@@ -1024,7 +1052,43 @@ class Delete(object):
         else:
             self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "session/" + self.session_id
         try:
-            from Handler import ZOIAPIHandler
+            from controllers.Handler import ZOIAPIHandler
+        except ImportError:
+            from .Handler import ZOIAPIHandler
+        return ZOIAPIHandler.get_instance(self).delete_request_handler()
+
+    def delete_document(self, service_id=None, document_delete_url=None):
+        if document_delete_url is not None:
+            self.api_end_point = document_delete_url
+        else:
+            if service_id == 1:
+                self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/" + self.document_id
+            elif service_id == 2:
+                self.api_end_point = ZOIConfigUtil.get_sheet_api_base_url() + "spreadsheet/" + self.document_id
+            elif service_id == 3:
+                self.api_end_point = ZOIConfigUtil.get_show_api_base_url() + "presentation/" + self.document_id
+            else:
+                return
+        try:
+            from controllers.Handler import ZOIAPIHandler
+        except ImportError:
+            from .Handler import ZOIAPIHandler
+        return ZOIAPIHandler.get_instance(self).delete_request_handler()
+
+    def delete_session(self, service_id=None, session_delete_url=None):
+        if session_delete_url is not None:
+            self.api_end_point = session_delete_url
+        else:
+            if service_id == 1:
+                self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "session/" + self.session_id
+            elif service_id == 2:
+                self.api_end_point = ZOIConfigUtil.get_sheet_api_base_url() + "session/" + self.session_id
+            elif service_id == 3:
+                self.api_end_point = ZOIConfigUtil.get_show_api_base_url() + "session/" + self.session_id
+            else:
+                return
+        try:
+            from controllers.Handler import ZOIAPIHandler
         except ImportError:
             from .Handler import ZOIAPIHandler
         return ZOIAPIHandler.get_instance(self).delete_request_handler()

@@ -1,1 +1,0 @@
-API demo output file will be stored in this folder

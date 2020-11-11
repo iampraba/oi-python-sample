@@ -5,7 +5,8 @@ class ZOIException(Exception):
     """
     This is the custom exception class for handling for Client Library exceptions
     """
-    message = 'Error occurred for {url}. Error Code: {code} Response error_content: {error_content}. Error Details::{error_details}'
+    message = 'Error occurred for {url}. Error Code: {code} Response error_content: {error_content}. Error Details::{' \
+              'error_details} '
 
     def __init__(self, url, status_code, err_message, exception_code='error', details=None, content=None):
         self.url = url
@@ -37,15 +38,8 @@ class Logger(object):
         # create formatter and add it to the handlers
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-        try:
-            from Utility import ZOIConfigUtil
-        except ImportError:
-            from .Utility import ZOIConfigUtil
-        try:
-            log_path = ZOIConfigUtil.config_prop_dict['applicationLogFilePath']
-        except KeyError:
-            import os
-            log_path = os.path.join(os.getcwd(), 'client_library.log')
+        import os
+        log_path = os.path.join(os.getcwd(), 'client_library.log')
         file_handler = logging.FileHandler(log_path)
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)
