@@ -161,7 +161,7 @@ class DocumentDefaults:
         handler_obj.permissions = {
             "document.export": True,
             "document.print": True,
-            "document.edit": False,
+            "document.edit": True,
             "review.changes.resolve": False,
             "review.comment": False,
             "collab.chat": True,
