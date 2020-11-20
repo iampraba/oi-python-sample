@@ -47,4 +47,6 @@ The files in ```controllers``` folder are necessary for the app to function prop
 
 To test the API, you can run ```Test.py``` file.
 
-Refer to sample code in ```zohowriter```, ```zohosheet``` and ```zohoshow``` folders in ```demo``` folder, in which the demo code is separately placed, resembling the API documentation.
+The ```Test.py``` file contains methods which invokes API only with mandatory parameters.
+
+Please refer to the sample code in ```zohowriter```, ```zohosheet``` and ```zohoshow``` folders in ```demo``` folder to explore various samples of code..

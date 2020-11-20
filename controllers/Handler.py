@@ -29,13 +29,13 @@ class APIHandler(object):
 
 class ZOIAPIHandler(APIHandler):
 
-    def __init__(self, editorobj):
+    def __init__(self, editor_obj):
         super().__init__()
-        self.editor_obj = editorobj
+        self.editor_obj = editor_obj
 
     @staticmethod
-    def get_instance(editorobj):
-        return ZOIAPIHandler(editorobj)
+    def get_instance(editor_obj):
+        return ZOIAPIHandler(editor_obj)
 
     def writer_request_handler(self):
         try:

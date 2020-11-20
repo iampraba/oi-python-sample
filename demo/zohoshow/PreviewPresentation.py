@@ -16,6 +16,11 @@ def configure():
             "show_api_base_url": "https://api.office-integrator.com/show/officeapi/"
         }
         config_obj.initialize(user_config)
+
+        # Used for demonstration only
+        from controllers.RestClient import ZOIConfigUtil
+        for key in ZOIConfigUtil.config_prop_dict:
+            print("{0}: {1}".format(key, ZOIConfigUtil.config_prop_dict[key]))
     except ZOIException as ex:
         print(ex.status_code)
         print(ex.error_code)
@@ -24,13 +29,14 @@ def configure():
         print(ex.error_content)
 
 
-def preview_presentation():
+def sample_1():
     try:
-        preview_show = PreviewPresentation.get_instance()
+        oi_demo_obj = PreviewPresentation.get_instance()
 
-        preview_show.upload_document("document", "../files/ZohoShow.pptx")
+        oi_demo_obj.set_url("https://file-examples-com.github.io/uploads/2017/08/file_example_PPT_500kB.ppt")
+        # oi_demo_obj.upload_document("document", "../files/ZohoShow.pptx")
 
-        response = preview_show.preview_presentation()
+        response = oi_demo_obj.preview_presentation()
         response_json = response.response_json
         for key in response_json:
             print("{0}: {1}".format(key, response_json[key]))
@@ -44,4 +50,4 @@ def preview_presentation():
 
 if __name__ == '__main__':
     configure()
-    preview_presentation()
+    sample_1()

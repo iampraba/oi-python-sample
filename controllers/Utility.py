@@ -1,5 +1,3 @@
-import random
-
 from controllers.ClientSideException import ZOIException
 
 
@@ -23,7 +21,6 @@ class APIConstants:
     MESSAGE = "message"
     CODE = "code"
     STATUS = "status"
-    DETAILS = "details"
 
     # POSSIBLE MANDATORY PARAMETERS
     API_KEY = "apikey"
@@ -89,342 +86,30 @@ class APIConstants:
     SHOW_API_VERSION = "show_api_version"
     DOCUMENT_TYPE = "document_type"
 
-    RESPONSECODE_OK = 200
-    RESPONSECODE_CREATED = 201
-    RESPONSECODE_ACCEPTED = 202
-    RESPONSECODE_NO_CONTENT = 204
-    RESPONSECODE_MOVED_PERMANENTLY = 301
-    RESPONSECODE_MOVED_TEMPORARILY = 302
-    RESPONSECODE_NOT_MODIFIED = 304
-    RESPONSECODE_BAD_REQUEST = 400
-    RESPONSECODE_AUTHORIZATION_ERROR = 401
-    RESPONSECODE_FORBIDDEN = 403
-    RESPONSECODE_NOT_FOUND = 404
-    RESPONSECODE_METHOD_NOT_ALLOWED = 405
-    RESPONSECODE_REQUEST_ENTITY_TOO_LARGE = 413
-    RESPONSECODE_UNSUPPORTED_MEDIA_TYPE = 415
-    RESPONSECODE_TOO_MANY_REQUEST = 429
-    RESPONSECODE_INTERNAL_SERVER_ERROR = 500
-    RESPONSECODE_INVALID_INPUT = 0
+    RESPONSE_CODE_OK = 200
+    RESPONSE_CODE_CREATED = 201
+    RESPONSE_CODE_ACCEPTED = 202
+    RESPONSE_CODE_NO_CONTENT = 204
+    RESPONSE_CODE_MOVED_PERMANENTLY = 301
+    RESPONSE_CODE_MOVED_TEMPORARILY = 302
+    RESPONSE_CODE_NOT_MODIFIED = 304
+    RESPONSE_CODE_BAD_REQUEST = 400
+    RESPONSE_CODE_AUTHORIZATION_ERROR = 401
+    RESPONSE_CODE_FORBIDDEN = 403
+    RESPONSE_CODE_NOT_FOUND = 404
+    RESPONSE_CODE_METHOD_NOT_ALLOWED = 405
+    RESPONSE_CODE_REQUEST_ENTITY_TOO_LARGE = 413
+    RESPONSE_CODE_UNSUPPORTED_MEDIA_TYPE = 415
+    RESPONSE_CODE_TOO_MANY_REQUEST = 429
+    RESPONSE_CODE_INTERNAL_SERVER_ERROR = 500
+    RESPONSE_CODE_INVALID_INPUT = 0
 
-    FAULTY_RESPONSE_CODES = [RESPONSECODE_NO_CONTENT, RESPONSECODE_NOT_FOUND, RESPONSECODE_AUTHORIZATION_ERROR,
-                             RESPONSECODE_BAD_REQUEST, RESPONSECODE_FORBIDDEN, RESPONSECODE_INTERNAL_SERVER_ERROR,
-                             RESPONSECODE_METHOD_NOT_ALLOWED, RESPONSECODE_MOVED_PERMANENTLY,
-                             RESPONSECODE_MOVED_TEMPORARILY, RESPONSECODE_REQUEST_ENTITY_TOO_LARGE,
-                             RESPONSECODE_TOO_MANY_REQUEST, RESPONSECODE_UNSUPPORTED_MEDIA_TYPE,
-                             RESPONSECODE_NOT_MODIFIED]
-
-
-class DocumentDefaults:
-
-    @staticmethod
-    def set_default_callback_settings(handler_obj):
-        handler_obj.callback_settings = {
-            "save_format": "zdoc",
-            "http_method_type": "post",
-            "timeout": 120000
-        }
-
-    @staticmethod
-    def set_default_create_document_defaults(handler_obj):
-        handler_obj.document_defaults = {
-            "orientation": "portrait",
-            "paper_size": "Letter",
-            "font_name": "Arial",
-            "font_size": 12,
-            "track_changes": "disabled",
-            "margin":
-                {
-                    "left": "1in",
-                    "right": "1in",
-                    "top": "1in",
-                    "bottom": "1in"
-                }
-        }
-
-    @staticmethod
-    def set_default_edit_document_defaults(handler_obj):
-        handler_obj.document_defaults = {
-            "track_changes": "disabled"
-        }
-
-    @staticmethod
-    def set_default_editor_settings(handler_obj):
-        handler_obj.editor_settings = {
-            "unit": "in",
-            "language": "en",
-            "view": "pageview"
-        }
-
-    @staticmethod
-    def set_default_permissions(handler_obj):
-        handler_obj.permissions = {
-            "document.export": True,
-            "document.print": True,
-            "document.edit": True,
-            "review.changes.resolve": False,
-            "review.comment": False,
-            "collab.chat": True,
-            "document.pausecollaboration": False,
-            "document.fill": True
-        }
-
-    @staticmethod
-    def set_default_document_info(handler_obj):
-        handler_obj.document_info = {
-            "document_name": "Untitled",
-        }
-
-    @staticmethod
-    def set_default_user_info(handler_obj):
-        handler_obj.user_info = {
-            "display_name": "Guest"
-        }
-
-    @staticmethod
-    def set_default_ui_options(handler_obj):
-        handler_obj.ui_options = {
-            "save_button": "show",
-            "chat_panel": "show"
-        }
-
-    @staticmethod
-    def set_default_watermark_settings(handler_obj):
-        handler_obj.watermark_settings = {
-            "orientation": "diagonal",
-            "font_name": "Arial",
-            "font_size": 36,
-            "font_color": "#000000",
-            "opacity": 0.0
-        }
-
-    @staticmethod
-    def set_default_webhook(handler_obj):
-        handler_obj.webhook = {
-            "invoke_period": "oncomplete"
-        }
-
-    @staticmethod
-    def set_default_lang(handler_obj):
-        handler_obj.lang = "en"
-
-    @staticmethod
-    def set_default_output_format(handler_obj):
-        handler_obj.output_format = "docx"
-
-    @staticmethod
-    def set_default_output_options(handler_obj):
-        handler_obj.output_options = {
-            "format": "docx",
-            "include_changes": "as_markups",
-            "include_comments": "all"
-        }
-
-    @staticmethod
-    def set_default_create_document_settings(handler_obj):
-        DocumentDefaults.set_default_callback_settings(handler_obj)
-        DocumentDefaults.set_default_create_document_defaults(handler_obj)
-        DocumentDefaults.set_default_editor_settings(handler_obj)
-        DocumentDefaults.set_default_permissions(handler_obj)
-        DocumentDefaults.set_default_document_info(handler_obj)
-        DocumentDefaults.set_default_user_info(handler_obj)
-        DocumentDefaults.set_default_ui_options(handler_obj)
-
-    @staticmethod
-    def set_default_edit_document_settings(handler_obj):
-        DocumentDefaults.set_default_callback_settings(handler_obj)
-        DocumentDefaults.set_default_edit_document_defaults(handler_obj)
-        DocumentDefaults.set_default_editor_settings(handler_obj)
-        DocumentDefaults.set_default_permissions(handler_obj)
-        DocumentDefaults.set_default_document_info(handler_obj)
-        DocumentDefaults.set_default_user_info(handler_obj)
-        DocumentDefaults.set_default_ui_options(handler_obj)
-
-    @staticmethod
-    def set_default_co_edit_document_settings(handler_obj):
-        DocumentDefaults.set_default_callback_settings(handler_obj)
-        DocumentDefaults.set_default_edit_document_defaults(handler_obj)
-        DocumentDefaults.set_default_editor_settings(handler_obj)
-        DocumentDefaults.set_default_permissions(handler_obj)
-        DocumentDefaults.set_default_document_info(handler_obj)
-        DocumentDefaults.set_default_user_info(handler_obj)
-        DocumentDefaults.set_default_ui_options(handler_obj)
-
-    @staticmethod
-    def set_default_preview_document_settings(handler_obj):
-        DocumentDefaults.set_default_lang(handler_obj)
-
-    @staticmethod
-    def set_default_watermark_with_text_settings(handler_obj):
-        DocumentDefaults.set_default_watermark_settings(handler_obj)
-
-    @staticmethod
-    def set_default_create_template_settings(handler_obj):
-        DocumentDefaults.set_default_callback_settings(handler_obj)
-        DocumentDefaults.set_default_create_document_defaults(handler_obj)
-        DocumentDefaults.set_default_editor_settings(handler_obj)
-        DocumentDefaults.set_default_permissions(handler_obj)
-        DocumentDefaults.set_default_document_info(handler_obj)
-        DocumentDefaults.set_default_user_info(handler_obj)
-
-    @staticmethod
-    def set_default_merge_and_deliver_via_webhook(handler_obj):
-        DocumentDefaults.set_default_output_format(handler_obj)
-        DocumentDefaults.set_default_webhook(handler_obj)
-
-    @staticmethod
-    def set_default_merge_and_download_settings(handler_obj):
-        DocumentDefaults.set_default_output_format(handler_obj)
-
-    @staticmethod
-    def set_default_convert_document_settings(handler_obj):
-        DocumentDefaults.set_default_output_options(handler_obj)
-
-    @staticmethod
-    def set_default_compare_document_settings(handler_obj):
-        DocumentDefaults.set_default_lang(handler_obj)
-
-
-class SheetDefaults:
-
-    @staticmethod
-    def set_default_callback_settings(handler_obj):
-        handler_obj.callback_settings = {
-            "save_format": "xlsx",
-        }
-
-    @staticmethod
-    def set_default_editor_settings(handler_obj):
-        handler_obj.editor_settings = {
-            "language": "en",
-            "country": "IN"
-        }
-
-    @staticmethod
-    def set_default_permissions(handler_obj):
-        handler_obj.permissions = {
-            "document.export": True,
-            "document.print": True,
-            "document.edit": True
-        }
-
-    @staticmethod
-    def set_default_document_info(handler_obj):
-        handler_obj.document_info = {
-            "document_name": "Untitled",
-        }
-
-    @staticmethod
-    def set_default_user_info(handler_obj):
-        handler_obj.user_info = {
-            "display_name": "Guest"
-        }
-
-    @staticmethod
-    def set_default_preview_permissions(handler_obj):
-        handler_obj.permissions = {
-            "document.export": True,
-            "document.print": True
-        }
-
-    @staticmethod
-    def set_default_language(handler_obj):
-        handler_obj.lang = "en"
-
-    @staticmethod
-    def set_default_create_spreadsheet_settings(handler_obj):
-        SheetDefaults.set_default_callback_settings(handler_obj)
-        SheetDefaults.set_default_editor_settings(handler_obj)
-        SheetDefaults.set_default_permissions(handler_obj)
-        SheetDefaults.set_default_document_info(handler_obj)
-        SheetDefaults.set_default_user_info(handler_obj)
-
-    @staticmethod
-    def set_default_edit_spreadsheet_settings(handler_obj):
-        SheetDefaults.set_default_callback_settings(handler_obj)
-        SheetDefaults.set_default_editor_settings(handler_obj)
-        SheetDefaults.set_default_permissions(handler_obj)
-        SheetDefaults.set_default_document_info(handler_obj)
-        SheetDefaults.set_default_user_info(handler_obj)
-
-    @staticmethod
-    def set_default_co_edit_spreadsheet_settings(handler_obj):
-        SheetDefaults.set_default_edit_spreadsheet_settings(handler_obj)
-
-    @staticmethod
-    def set_default_preview_spreadsheet_settings(handler_obj):
-        SheetDefaults.set_default_language(handler_obj)
-        SheetDefaults.set_default_preview_permissions(handler_obj)
-
-
-class ShowDefaults:
-
-    @staticmethod
-    def set_default_callback_settings(handler_obj):
-        handler_obj.callback_settings = {
-            "save_format": "pptx",
-            "save_url": "https://zylker.com/save.php",
-        }
-
-    @staticmethod
-    def set_default_editor_settings(handler_obj):
-        handler_obj.editor_settings = {
-            "language": "en"
-        }
-
-    @staticmethod
-    def set_default_permissions(handler_obj):
-        handler_obj.permissions = {
-            "document.export": True,
-            "document.print": True,
-            "document.edit": True
-        }
-
-    @staticmethod
-    def set_default_document_info(handler_obj):
-        handler_obj.document_info = {
-            "document_name": "Untitled",
-            "document_id": random.randint(10000000, 100000000)
-        }
-
-    @staticmethod
-    def set_default_user_info(handler_obj):
-        handler_obj.user_info = {
-            "user_id": random.randint(1000000, 10000000),
-            "display_name": "Guest"
-        }
-
-    @staticmethod
-    def set_default_language(handler_obj):
-        handler_obj.language = "en"
-
-    @staticmethod
-    def set_default_format(handler_obj):
-        handler_obj.format = "pptx"
-
-    @staticmethod
-    def set_default_create_presentation_settings(handler_obj):
-        ShowDefaults.set_default_callback_settings(handler_obj)
-        ShowDefaults.set_default_editor_settings(handler_obj)
-        ShowDefaults.set_default_permissions(handler_obj)
-        SheetDefaults.set_default_document_info(handler_obj)
-        SheetDefaults.set_default_user_info(handler_obj)
-
-    @staticmethod
-    def set_default_edit_presentation_settings(handler_obj):
-        ShowDefaults.set_default_create_presentation_settings(handler_obj)
-
-    @staticmethod
-    def set_default_co_edit_presentation_settings(handler_obj):
-        ShowDefaults.set_default_create_presentation_settings(handler_obj)
-
-    @staticmethod
-    def set_default_preview_presentation_settings(handler_obj):
-        ShowDefaults.set_default_language(handler_obj)
-
-    @staticmethod
-    def set_default_conversion_api_settings(handler_obj):
-        ShowDefaults.set_default_format(handler_obj)
+    FAULTY_RESPONSE_CODES = [RESPONSE_CODE_NO_CONTENT, RESPONSE_CODE_NOT_FOUND, RESPONSE_CODE_AUTHORIZATION_ERROR,
+                             RESPONSE_CODE_BAD_REQUEST, RESPONSE_CODE_FORBIDDEN, RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+                             RESPONSE_CODE_METHOD_NOT_ALLOWED, RESPONSE_CODE_MOVED_PERMANENTLY,
+                             RESPONSE_CODE_MOVED_TEMPORARILY, RESPONSE_CODE_REQUEST_ENTITY_TOO_LARGE,
+                             RESPONSE_CODE_TOO_MANY_REQUEST, RESPONSE_CODE_UNSUPPORTED_MEDIA_TYPE,
+                             RESPONSE_CODE_NOT_MODIFIED]
 
 
 class CommonUtil:
@@ -446,7 +131,6 @@ class CommonUtil:
             with open(req_files[key], 'rb') as f:
                 attachment_dict[key] = f.read()
             f.close()
-            # attachment_dict[key] = open(reqFiles[key], 'rb')
         return attachment_dict
 
     @staticmethod
@@ -458,7 +142,7 @@ class CommonUtil:
 
     @staticmethod
     def raise_exception(url, message, details, content=None):
-        zoi_exception = ZOIException(url, APIConstants.RESPONSECODE_INVALID_INPUT, message, APIConstants.STATUS_ERROR,
+        zoi_exception = ZOIException(url, APIConstants.RESPONSE_CODE_INVALID_INPUT, message, APIConstants.STATUS_ERROR,
                                      details, content)
         import logging
         try:

@@ -44,11 +44,15 @@ class APIRequest(object):
                 connector.set_file(attachments)
 
             response = connector.trigger_request()
-            content_type = response.headers["Content-Type"]
-            if "application/json" in content_type or "text/" in content_type:
+
+            try:
+                if "application/json" in response.headers["Content-Type"] or "text/" in response.headers[
+                    "Content-Type"]:
+                    return APIResponse(response, response.status_code, self.url)
+                else:
+                    return FileAPIResponse(response, response.status_code, self.url)
+            except KeyError:
                 return APIResponse(response, response.status_code, self.url)
-            else:
-                return FileAPIResponse(response, response.status_code, self.url)
         except ZOIException as ex:
             raise ex
         except Exception as ex:
@@ -76,7 +80,7 @@ class APIResponse(object):
         self.process_response()
 
     def set_response(self):
-        if self.status_code != APIConstants.RESPONSECODE_NO_CONTENT and self.status_code != APIConstants.RESPONSECODE_NOT_MODIFIED:
+        if self.status_code != APIConstants.RESPONSE_CODE_NO_CONTENT and self.status_code != APIConstants.RESPONSE_CODE_NOT_MODIFIED:
             self.response_json = self.response.json()
         self.response_headers = self.response.headers
 
@@ -87,7 +91,7 @@ class APIResponse(object):
             self.process_response_data()
 
     def handle_faulty_responses(self):
-        if self.status_code == APIConstants.RESPONSECODE_NO_CONTENT:
+        if self.status_code == APIConstants.RESPONSE_CODE_NO_CONTENT:
             error_msg = APIConstants.INVALID_DATA + "-" + APIConstants.INVALID_ID_MSG
             exception = ZOIException(self.url, self.status_code, error_msg, APIConstants.NO_CONTENT, None, error_msg)
             exception.message = exception.__str__()
@@ -96,8 +100,7 @@ class APIResponse(object):
             print(json.dumps(self.response_json, indent=4))
             response_json = self.response_json
             exception = ZOIException(self.url, self.status_code, response_json[APIConstants.MESSAGE],
-                                     response_json[APIConstants.CODE], response_json[APIConstants.DETAILS],
-                                     response_json[APIConstants.MESSAGE])
+                                     response_json[APIConstants.CODE], response_json[APIConstants.MESSAGE])
             exception.message = exception.__str__()
             raise exception
 
@@ -107,15 +110,13 @@ class APIResponse(object):
             resp_json = resp_json[0]
         if APIConstants.STATUS in resp_json and (resp_json[APIConstants.STATUS] == APIConstants.STATUS_ERROR):
             exception = ZOIException(self.url, self.status_code, resp_json[APIConstants.MESSAGE],
-                                     resp_json[APIConstants.CODE], resp_json[APIConstants.DETAILS],
-                                     resp_json[APIConstants.STATUS])
+                                     resp_json[APIConstants.CODE], resp_json[APIConstants.STATUS])
             exception.message = exception.__str__()
             raise exception
         elif APIConstants.STATUS in resp_json and (resp_json[APIConstants.STATUS] == APIConstants.STATUS_SUCCESS):
             self.status = resp_json[APIConstants.STATUS]
             self.code = resp_json[APIConstants.CODE]
             self.message = resp_json[APIConstants.MESSAGE]
-            self.details = resp_json[APIConstants.DETAILS]
 
 
 class FileAPIResponse(object):
@@ -134,14 +135,14 @@ class FileAPIResponse(object):
         self.handle_file_response()
 
     def handle_file_response(self):
-        if self.status_code == APIConstants.RESPONSECODE_OK:
+        if self.status_code == APIConstants.RESPONSE_CODE_OK:
             self.status = APIConstants.STATUS_SUCCESS
             content_disposition = self.response.headers['Content-Disposition']
             start_index = content_disposition.rindex("=")
             self.file_name = content_disposition[start_index + 1:]
             self.file_content = self.response.content
             self.response_headers = self.response.headers
-        elif self.status_code == APIConstants.RESPONSECODE_NO_CONTENT:
+        elif self.status_code == APIConstants.RESPONSE_CODE_NO_CONTENT:
             error_msg = APIConstants.INVALID_DATA + "-" + APIConstants.INVALID_ID_MSG
             exception = ZOIException(self.url, self.status_code, error_msg, APIConstants.NO_CONTENT, None,
                                      error_msg)
@@ -150,8 +151,7 @@ class FileAPIResponse(object):
         else:
             response_json = self.response.json()
             exception = ZOIException(self.url, self.response.status_code, response_json[APIConstants.MESSAGE],
-                                     response_json[APIConstants.CODE], response_json[APIConstants.DETAILS],
-                                     response_json[APIConstants.MESSAGE])
+                                     response_json[APIConstants.CODE], response_json[APIConstants.MESSAGE])
             exception.message = exception.__str__()
             raise exception
 
@@ -180,14 +180,6 @@ class HTTPConnector(object):
 
     def trigger_request(self):
         response = None
-
-        # For Testing these temporary print statements are included!!!
-        # print(self.url)
-        # print(self.req_headers)
-        # print(self.req_method)
-        # print(self.req_params)
-        # print(self.req_body)
-        # print(self.file)
 
         if self.req_method == APIConstants.REQUEST_METHOD_GET:
             response = requests.get(self.url, headers=self.req_headers, params=self.req_params, allow_redirects=False)

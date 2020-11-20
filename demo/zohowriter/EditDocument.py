@@ -1,12 +1,9 @@
 from controllers.ClientSideException import ZOIException
-from controllers.Operations import CoEditPresentation
+from controllers.Operations import EditDocument
 from controllers.RestClient import ZOIRestClient
 
 
 def configure():
-    """
-    Passing the entire configuration as a dictionary
-    """
     try:
         config_obj = ZOIRestClient.get_instance()
         user_config = {
@@ -31,26 +28,41 @@ def configure():
 
 def sample_1():
     try:
-        oi_demo_obj = CoEditPresentation.get_instance()
+        oi_demo_obj = EditDocument.get_instance()
 
-        oi_demo_obj.set_url("https://file-examples-com.github.io/uploads/2017/08/file_example_PPT_500kB.ppt")
+        oi_demo_obj.set_callback_settings("save_format", "docx")
+        oi_demo_obj.set_callback_settings("save_url", "https://domain.com/save.php")
+        oi_demo_obj.set_callback_settings("http_method_type", "post")
+        oi_demo_obj.set_callback_settings("timeout", 120000)
 
-        oi_demo_obj.set_callback_settings("save_format", "pptx")
-        oi_demo_obj.set_callback_settings("save_url", "https://zylker.com/save.php")
-        oi_demo_obj.set_callback_settings("context_info", "additional doc or user info")
+        oi_demo_obj.set_document_defaults("track_changes", "disabled")
 
+        oi_demo_obj.set_editor_settings("unit", "in")
         oi_demo_obj.set_editor_settings("language", "en")
+        oi_demo_obj.set_editor_settings("view", "pageview")
 
         oi_demo_obj.set_permissions("document.export", True)
         oi_demo_obj.set_permissions("document.print", True)
         oi_demo_obj.set_permissions("document.edit", True)
+        oi_demo_obj.set_permissions("review.changes.resolve", False)
+        oi_demo_obj.set_permissions("review.comment", False)
+        oi_demo_obj.set_permissions("collab.chat", True)
+        oi_demo_obj.set_permissions("document.pausecollaboration", False)
+        oi_demo_obj.set_permissions("document.fill", True)
 
         oi_demo_obj.set_document_info("document_name", "Untitled")
         # oi_demo_obj.set_document_info("document_id", document_id)
 
+        # oi_demo_obj.set_user_info("user_id", user_id)
         oi_demo_obj.set_user_info("display_name", "Guest")
 
-        response = oi_demo_obj.co_edit_presentation()
+        oi_demo_obj.set_ui_options("save_button", "show")
+        oi_demo_obj.set_ui_options("chat_panel", "show")
+
+        # Link used for demonstration purposes only
+        oi_demo_obj.set_url("https://file-examples-com.github.io/uploads/2017/02/file-sample_500kB.docx")
+
+        response = oi_demo_obj.edit_document()
         response_json = response.response_json
         for key in response_json:
             print("{0}: {1}".format(key, response_json[key]))
@@ -64,34 +76,50 @@ def sample_1():
 
 def sample_2():
     try:
-        oi_demo_obj = CoEditPresentation.get_instance()
-
-        oi_demo_obj.upload_document("document", "../files/ZohoShow.pptx")
+        oi_demo_obj = EditDocument.get_instance()
 
         oi_demo_obj.set_bulk_callback_settings(
-            save_format="pptx",
-            save_url="https://zylker.com/save.php",
-            context_info="additional doc or user info"
+            save_format="docx",
+            save_url="https://domain.com/save.php",
+            save_url_params=None,
+            http_method_type="post",
+            timeout=120000,
+            retries=None
         )
-
+        oi_demo_obj.set_bulk_document_defaults(
+            track_changes="disabled"
+        )
         oi_demo_obj.set_bulk_editor_settings(
-            language="en"
+            unit="in",
+            language="en",
+            view="pageview"
         )
-
         oi_demo_obj.set_bulk_permissions(
             document_export=True,
             document_print=True,
-            document_edit=True
+            document_edit=True,
+            review_changes_resolve=False,
+            review_comment=False,
+            collab_chat=True,
+            document_pausecollaboration=False,
+            document_fill=True
         )
-
         oi_demo_obj.set_bulk_document_info(
             # document_id=document_id,
             document_name="Untitled"
         )
+        oi_demo_obj.set_bulk_user_info(
+            # user_id=user_id,
+            display_name="Guest"
+        )
+        oi_demo_obj.set_bulk_ui_options(
+            save_button="show",
+            chat_panel="show"
+        )
 
-        oi_demo_obj.set_user_info("display_name", "Guest")
+        oi_demo_obj.upload_document("document", "../files/ZohoWriter.docx")
 
-        response = oi_demo_obj.co_edit_presentation()
+        response = oi_demo_obj.edit_document()
         response_json = response.response_json
         for key in response_json:
             print("{0}: {1}".format(key, response_json[key]))
@@ -105,38 +133,61 @@ def sample_2():
 
 def sample_3():
     try:
-        oi_demo_obj = CoEditPresentation.get_instance()
-
-        oi_demo_obj.upload_document("document", "../files/ZohoShow.pptx")
+        oi_demo_obj = EditDocument.get_instance()
 
         callback_settings = {
-            "save_format": "pptx",
-            "save_url": "https://zylker.com/save.php",
-            "context_info": "additional doc or user info"
+            "save_format": "docx",
+            "save_url": "https://domain.com/save.php",
+            "http_method_type": "post",
+            "timeout": 120000
         }
         oi_demo_obj.set_bulk_callback_settings(callback_settings)
 
+        document_defaults = {
+            "track_changes": "disabled"
+        }
+        oi_demo_obj.set_bulk_document_defaults(document_defaults)
+
         editor_settings = {
-            "language": "en"
+            "unit": "in",
+            "language": "en",
+            "view": "pageview"
         }
         oi_demo_obj.set_bulk_editor_settings(editor_settings)
 
         permissions = {
             "document.export": True,
             "document.print": True,
-            "document.edit": True
+            "document.edit": True,
+            "review.changes.resolve": False,
+            "review.comment": False,
+            "collab.chat": True,
+            "document.pausecollaboration": False,
+            "document.fill": True
         }
         oi_demo_obj.set_bulk_permissions(permissions)
 
         document_info = {
-            # document_id: document_id,
+            # "document_id": document_id,
             "document_name": "Untitled"
         }
         oi_demo_obj.set_bulk_document_info(document_info)
 
-        oi_demo_obj.set_user_info("display_name", "Guest")
+        user_info = {
+            # "user_id": user_id,
+            "display_name": "Guest"
+        }
+        oi_demo_obj.set_bulk_user_info(user_info)
 
-        response = oi_demo_obj.co_edit_presentation()
+        ui_options = {
+            "save_button": "show",
+            "chat_panel": "show"
+        }
+        oi_demo_obj.set_bulk_ui_options(ui_options)
+
+        oi_demo_obj.upload_document("document", "../files/ZohoWriter.docx")
+
+        response = oi_demo_obj.edit_document()
         response_json = response.response_json
         for key in response_json:
             print("{0}: {1}".format(key, response_json[key]))

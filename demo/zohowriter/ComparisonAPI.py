@@ -16,6 +16,11 @@ def configure():
             "show_api_base_url": "https://api.office-integrator.com/show/officeapi/"
         }
         config_obj.initialize(user_config)
+
+        # Used for demonstration only
+        from controllers.RestClient import ZOIConfigUtil
+        for key in ZOIConfigUtil.config_prop_dict:
+            print("{0}: {1}".format(key, ZOIConfigUtil.config_prop_dict[key]))
     except ZOIException as ex:
         print(ex.status_code)
         print(ex.error_code)
@@ -24,18 +29,21 @@ def configure():
         print(ex.error_content)
 
 
-def compare_document():
+def sample_1():
     try:
-        compare_document = CompareDocuments.get_instance()
+        oi_demo_obj = CompareDocuments.get_instance()
 
-        compare_document.upload_document("document1", "../files/CompareDocument1.docx")
-        # compare_document.set_url1("File URL Here")
-        compare_document.upload_document("document2", "../files/CompareDocument2.docx")
-        # compare_document.set_url2("File URL Here")
-        compare_document.set_title("Doc1_and_Doc2")
-        # compare_document.set_lang("en")
+        oi_demo_obj.upload_document("document1", "../files/CompareDocument1.docx")
+        # oi_demo_obj.set_url1("URL")
 
-        response = compare_document.compare_documents()
+        oi_demo_obj.upload_document("document2", "../files/CompareDocument2.docx")
+        # oi_demo_obj.set_url2("URL")
+
+        oi_demo_obj.set_title("Doc1_and_Doc2")
+
+        oi_demo_obj.set_lang("en")
+
+        response = oi_demo_obj.compare_documents()
         response_json = response.response_json
         for key in response_json:
             print("{0}: {1}".format(key, response_json[key]))
@@ -49,4 +57,5 @@ def compare_document():
 
 if __name__ == '__main__':
     configure()
-    compare_document()
+    print()
+    sample_1()

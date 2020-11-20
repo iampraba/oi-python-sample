@@ -1,5 +1,3 @@
-import random  # Imported to generate random document id
-
 from controllers.APIHelper import APIResponse, FileAPIResponse
 from controllers.ClientSideException import ZOIException
 from controllers.Operations import *
@@ -10,7 +8,7 @@ class MyClass(object):
     created_document_id = ""
     created_session_id = ""
 
-    collaboration_document_id = random.randint(10000000, 100000000)
+    collaboration_document_id = None
 
     shouldSaveAsFile = "N"
 
@@ -30,6 +28,11 @@ class MyClass(object):
             config_obj.set_show_api_base_url("https://api.office-integrator.com/show/officeapi/")
 
             config_obj.initialize()
+
+            # Used for demonstration only
+            from controllers.RestClient import ZOIConfigUtil
+            for key in ZOIConfigUtil.config_prop_dict:
+                print("{0}: {1}".format(key, ZOIConfigUtil.config_prop_dict[key]))
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -50,6 +53,11 @@ class MyClass(object):
             }
 
             config_obj.initialize(user_config)
+
+            # Used for demonstration only
+            from controllers.RestClient import ZOIConfigUtil
+            for key in ZOIConfigUtil.config_prop_dict:
+                print("{0}: {1}".format(key, ZOIConfigUtil.config_prop_dict[key]))
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -65,25 +73,17 @@ class MyClass(object):
             config_obj.upload_configuration_file("configurations/AppConfiguration.json")
 
             config_obj.initialize()
+
+            # Used for demonstration only
+            from controllers.RestClient import ZOIConfigUtil
+            for key in ZOIConfigUtil.config_prop_dict:
+                print("{0}: {1}".format(key, ZOIConfigUtil.config_prop_dict[key]))
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
             print(ex.error_message)
             print(ex.error_details)
             print(ex.error_content)
-
-    # ALTERNATE WAYS TO PASS ON THE CONFIGURATION - SAME APPLIES FOR ALL METHODS IN THIS SDK
-
-    # create_doc.set_bulk_callback_settings(save_format_or_list="docx", save_url="https://domain.com/save.php", context_info="additional doc or user info")
-    # create_doc.set_bulk_callback_settings("docx", save_url="https://domain.com/save.php")
-    # create_doc.set_bulk_callback_settings(save_url="https://domain.com/save.php")
-
-    # my_callback_settings = [
-    #     "docx",
-    #     "https://domain.com/save.php",
-    #     "additional doc or user info"
-    # ]
-    # create_doc.set_bulk_callback_settings(my_callback_settings)
 
     @staticmethod
     def create_document():
@@ -92,9 +92,6 @@ class MyClass(object):
 
             create_doc.set_callback_settings("save_format", "docx")
             create_doc.set_callback_settings("save_url", "https://domain.com/save.php")
-            create_doc.set_callback_settings("context_info", "additional doc or user info")
-
-            create_doc.set_bulk_document_defaults()
 
             response = create_doc.create_document()
             response_json = response.response_json
@@ -104,7 +101,8 @@ class MyClass(object):
             # To save API response as JSON file
             MyClass.save_response_as_json_file("CreateDocument", response_json)
 
-            # To demonstrate delete document and delete session
+            # To demonstrate collaboration and deletion features
+            MyClass.collaboration_document_id = response_json["document_id"]
             MyClass.created_document_id = response_json["document_id"]
             MyClass.created_session_id = response_json["session_id"]
         except ZOIException as ex:
@@ -117,19 +115,14 @@ class MyClass(object):
     @staticmethod
     def edit_document():
         try:
-            print("Using document ID: " + str(MyClass.collaboration_document_id))
             print("In response, Navigate to the document using \"document_url\" and start editing your document.\n")
 
             edit_doc = EditDocument.get_instance()
 
-            edit_doc.set_document_info("document_id", MyClass.collaboration_document_id)
-            edit_doc.set_user_info("user_id", "1000")
-            edit_doc.set_user_info("display_name", "Matt")
+            edit_doc.upload_document("document", "demo/files/ZohoWriter.docx")
+
             edit_doc.set_callback_settings("save_format", "docx")
             edit_doc.set_callback_settings("save_url", "https://domain.com/save.php")
-            edit_doc.set_callback_settings("context_info", "additional doc or user info")
-            edit_doc.upload_document("document", "demo/files/ZohoWriter.docx")
-            # edit_doc.set_url("File URL Here")
 
             response = edit_doc.edit_document()
             response_json = response.response_json
@@ -150,17 +143,15 @@ class MyClass(object):
         try:
             co_edit_doc = CoEditDocument.get_instance()
 
-            print("Using document ID: " + str(
+            print("Using created document ID: " + str(
                 MyClass.collaboration_document_id) + ". Share the \"document_url\" in response to collaborators\n")
 
-            co_edit_doc.set_user_info("user_id", "2000")
-            co_edit_doc.set_user_info("display_name", "Anil")
-            co_edit_doc.set_document_info("document_id", MyClass.collaboration_document_id)
+            co_edit_doc.upload_document("document", "demo/files/ZohoShow.pptx")
+
             co_edit_doc.set_callback_settings("save_format", "docx")
             co_edit_doc.set_callback_settings("save_url", "https://domain.com/save.php")
-            co_edit_doc.set_callback_settings("context_info", "additional doc or user info")
-            co_edit_doc.upload_document("document", "demo/files/ZohoWriter.docx")
-            # co_edit_doc.set_url("File URL Here")
+
+            co_edit_doc.set_document_info("document_id", MyClass.collaboration_document_id)
 
             response = co_edit_doc.co_edit_document()
             response_json = response.response_json
@@ -181,9 +172,7 @@ class MyClass(object):
         try:
             preview_doc = PreviewDocument.get_instance()
 
-            preview_doc.set_lang("en")
             preview_doc.upload_document("document", "demo/files/ZohoWriter.docx")
-            # preview_doc.set_url("File URL Here")
 
             response = preview_doc.preview_document()
             response_json = response.response_json
@@ -204,11 +193,10 @@ class MyClass(object):
         try:
             watermark_doc = WatermarkDocument.get_instance()
 
-            watermark_doc.set_watermark_settings("type", "text")
-            watermark_doc.set_watermark_settings("opacity", "0.5")
-            watermark_doc.set_watermark_settings("text", "Zoho Corp.")
             watermark_doc.upload_document("document", "demo/files/ZohoWriter_Watermark.docx")
-            # watermark_doc.set_url("File URL Here")
+
+            watermark_doc.set_watermark_settings("type", "text")
+            watermark_doc.set_watermark_settings("text", "Office Integrator")
 
             response = watermark_doc.watermark_document()
             if isinstance(response, APIResponse):
@@ -233,14 +221,14 @@ class MyClass(object):
             print(ex.error_content)
 
     @staticmethod
-    def create_template():  # TODO Add setters for 'merge_data_csv_url' and 'merge_data_json_url'
+    def create_template():
         try:
             create_template = CreateTemplate.get_instance()
 
             create_template.set_callback_settings("save_format", "docx")
             create_template.set_callback_settings("save_url", "https://domain.com/save.php")
-            create_template.set_callback_settings("context_info", "additional doc or user info")
-            create_template.upload_document("merge_data_json_content", "demo/files/mergedata.json")
+
+            create_template.upload_document("merge_data_json_content", "demo/files/merge_data.json")
 
             response = create_template.create_template()
             response_json = response.response_json
@@ -261,8 +249,7 @@ class MyClass(object):
         try:
             get_fields = GetFields.get_instance()
 
-            get_fields.upload_document("file_content", "demo/files/ZohoWriter_MergeTemplete.docx")
-            # get_fields.set_file_url("File URL Here")
+            get_fields.upload_document("file_content", "demo/files/ZohoWriter_MergeTemplate.docx")
 
             response = get_fields.get_fields()
             response_json = response.response_json
@@ -284,12 +271,15 @@ class MyClass(object):
             merge_deliver = MergeAndDeliver.get_instance()
 
             merge_deliver.set_output_format("pdf")
+
+            merge_deliver.upload_document("file_content", "demo/files/ZohoWriter_MergeTemplate.docx")
+
             merge_deliver.set_webhook("invoke_url", "https://domain.com/xyz.php")
             merge_deliver.set_webhook("invoke_period", "oncomplete")
+
             merge_deliver.set_merge_to("separatedoc")
-            merge_deliver.upload_document("file_content", "demo/files/ZohoWriter_MergeTemplete.docx")
-            # merge_deliver.set_file_url("File URL Here")
-            merge_deliver.upload_document("merge_data_json_content", "demo/files/mergedata.json")
+
+            merge_deliver.upload_document("merge_data_json_content", "demo/files/merge_data.json")
 
             response = merge_deliver.merge_and_deliver()
             response_json = response.response_json
@@ -311,8 +301,10 @@ class MyClass(object):
             merge_download = MergeAndDownload.get_instance()
 
             merge_download.set_output_format("pdf")
-            merge_download.upload_document("file_content", "demo/files/ZohoWriter_MergeTemplete.docx")
-            merge_download.upload_document("merge_data_json_content", "demo/files/mergedata.json")
+
+            merge_download.upload_document("file_content", "demo/files/ZohoWriter_MergeTemplate.docx")
+
+            merge_download.upload_document("merge_data_json_content", "demo/files/merge_data.json")
 
             response = merge_download.merge_and_download()
             if isinstance(response, APIResponse):
@@ -342,10 +334,10 @@ class MyClass(object):
         try:
             convert_document = ConvertDocument.get_instance()
 
+            convert_document.upload_document("document", "demo/files/ZohoWriter.docx")
+
             convert_document.set_output_options("format", "docx")
             convert_document.set_output_options("document_name", "Untitled")
-            convert_document.upload_document("document", "demo/files/ZohoWriter.docx")
-            # convert_document.set_url("File URL Here")
 
             response = convert_document.convert_document()
             if isinstance(response, APIResponse):
@@ -375,11 +367,8 @@ class MyClass(object):
             compare_document = CompareDocuments.get_instance()
 
             compare_document.upload_document("document1", "demo/files/CompareDocument1.docx")
-            # compare_document.set_url1("File URL Here")
+
             compare_document.upload_document("document2", "demo/files/CompareDocument2.docx")
-            # compare_document.set_url2("File URL Here")
-            compare_document.set_title("Doc1_and_Doc2")
-            # compare_document.set_lang("en")
 
             response = compare_document.compare_documents()
             response_json = response.response_json
@@ -402,7 +391,6 @@ class MyClass(object):
 
             create_sheet.set_callback_settings("save_format", "xlsx")
             create_sheet.set_callback_settings("save_url", "https://zylker.com/save.php")
-            create_sheet.set_callback_settings("context_info", "additional doc or user info")
 
             response = create_sheet.create_spreadsheet()
             response_json = response.response_json
@@ -411,6 +399,9 @@ class MyClass(object):
 
             # To save API response as JSON file
             MyClass.save_response_as_json_file("CreateSpreadsheet", response_json)
+
+            # To demonstrate collaboration and deletion features
+            MyClass.collaboration_document_id = response_json["document_id"]
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -423,12 +414,10 @@ class MyClass(object):
         try:
             edit_sheet = EditSpreadsheet.get_instance()
 
-            edit_sheet.set_user_info("display_name", "Matt")
-            edit_sheet.set_document_info("document_id", MyClass.collaboration_document_id)
+            edit_sheet.upload_document("document", "demo/files/ZohoSheet.xlsx")
+
             edit_sheet.set_callback_settings("save_format", "xlsx")
             edit_sheet.set_callback_settings("save_url", "https://zylker.com/save.php")
-            edit_sheet.set_callback_settings("context_info", "additional doc or user info")
-            edit_sheet.upload_document("document", "demo/files/ZohoSheet.xlsx")
 
             response = edit_sheet.edit_spreadsheet()
             response_json = response.response_json
@@ -449,13 +438,15 @@ class MyClass(object):
         try:
             co_edit_sheet = CoEditSpreadsheet.get_instance()
 
-            co_edit_sheet.set_user_info("display_name", "Anil")
-            co_edit_sheet.set_document_info("document_id", MyClass.collaboration_document_id)
+            print("Using created sheet ID: " + str(
+                MyClass.collaboration_document_id) + ". Share the \"document_url\" in response to collaborators\n")
+
+            co_edit_sheet.upload_document("document", "demo/files/ZohoSheet.xlsx")
+
             co_edit_sheet.set_callback_settings("save_format", "xlsx")
             co_edit_sheet.set_callback_settings("save_url", "https://zylker.com/save.php")
-            co_edit_sheet.set_callback_settings("context_info", "additional doc or user info")
-            co_edit_sheet.upload_document("document", "demo/files/ZohoSheet.xlsx")
-            # co_edit_sheet.set_url("")
+
+            # co_edit_sheet.set_document_info("document_id", MyClass.collaboration_document_id)
 
             response = co_edit_sheet.co_edit_spreadsheet()
             response_json = response.response_json
@@ -476,8 +467,7 @@ class MyClass(object):
         try:
             preview_sheet = PreviewSpreadsheet.get_instance()
 
-            preview_sheet.set_url("https://file-examples-com.github.io/uploads/2017/02/file_example_XLSX_5000.xlsx")
-            # preview_sheet.upload_document("document", "demo/files/ZohoSheet.xlsx")
+            preview_sheet.upload_document("document", "demo/files/ZohoSheet.xlsx")
 
             response = preview_sheet.preview_spreadsheet()
             response_json = response.response_json
@@ -500,7 +490,6 @@ class MyClass(object):
 
             create_show.set_callback_settings("save_format", "pptx")
             create_show.set_callback_settings("save_url", "https://domain.com/save.php")
-            create_show.set_callback_settings("context_info", "additional doc or user info")
 
             response = create_show.create_presentation()
             response_json = response.response_json
@@ -509,6 +498,9 @@ class MyClass(object):
 
             # To save API response as JSON file
             MyClass.save_response_as_json_file("CreatePresentation", response_json)
+
+            # To demonstrate collaboration and deletion features
+            MyClass.collaboration_document_id = response_json["document_id"]
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -521,13 +513,10 @@ class MyClass(object):
         try:
             edit_show = EditPresentation.get_instance()
 
-            edit_show.set_user_info("user_id", "3000")
-            edit_show.set_user_info("display_name", "Matt")
-            edit_show.set_callback_settings("save_format", "pptx")
-            edit_show.set_document_info("document_id", MyClass.collaboration_document_id)
-            edit_show.set_callback_settings("save_url", "https://domain.com/save.php")
-            edit_show.set_callback_settings("context_info", "additional doc or user info")
             edit_show.upload_document("document", "demo/files/ZohoShow.pptx")
+
+            edit_show.set_callback_settings("save_format", "pptx")
+            edit_show.set_callback_settings("save_url", "https://domain.com/save.php")
 
             response = edit_show.edit_presentation()
             response_json = response.response_json
@@ -548,13 +537,15 @@ class MyClass(object):
         try:
             co_edit_show = CoEditPresentation.get_instance()
 
-            co_edit_show.set_user_info("user_id", "3000")
-            co_edit_show.set_user_info("display_name", "Anil")
+            print("Using created show ID: " + str(
+                MyClass.collaboration_document_id) + ". Share the \"document_url\" in response to collaborators\n")
+
+            # co_edit_show.upload_document("document", "demo/files/ZohoShow.pptx")
+
             co_edit_show.set_callback_settings("save_format", "pptx")
-            co_edit_show.set_document_info("document_id", MyClass.collaboration_document_id)
             co_edit_show.set_callback_settings("save_url", "https://domain.com/save.php")
-            co_edit_show.set_callback_settings("context_info", "additional doc or user info")
-            co_edit_show.upload_document("document", "demo/files/ZohoShow.pptx")
+
+            co_edit_show.set_document_info("document_id", MyClass.collaboration_document_id)
 
             response = co_edit_show.co_edit_presentation()
             response_json = response.response_json
@@ -628,18 +619,36 @@ class MyClass(object):
             delete_document = Delete.get_instance()
 
             # delete_writer_document.set_document_id("")  # Actual set document id call
-            service_id = input("Choose a service: \n1) Writer\t2) Sheet\t3) Show")
+            service_id = int(input("Choose a service: \n1) Writer\t2) Sheet\t3) Show"))
             if service_id == 1:
-                delete_document.set_document_id(
-                    input("Enter the document ID to delete: "))  # Used for demonstration
+                # USED FOR DEMONSTRATION ONLY
+                response_json = CreateDocument.get_instance().create_document().response_json
+                document_id = response_json["document_id"]
+                # document_delete_url = response_json["document_delete_url"]
+
+                delete_document.set_document_id(document_id)
+                # delete_document.set_document_delete_url(document_delete_url)
+
                 response = delete_document.delete_writer_document()
             elif service_id == 2:
-                delete_document.set_document_id(
-                    input("Enter the document ID to delete: "))  # Used for demonstration
+                # USED FOR DEMONSTRATION ONLY
+                response_json = CreateSpreadsheet.get_instance().create_spreadsheet().response_json
+                document_id = response_json["document_id"]
+                # document_delete_url = response_json["document_delete_url"]
+
+                delete_document.set_document_id(document_id)
+                # delete_document.set_document_delete_url(document_delete_url)
+
                 response = delete_document.delete_sheet_document()
             elif service_id == 3:
-                delete_document.set_document_id(
-                    input("Enter the document ID to delete: "))  # Used for demonstration
+                # USED FOR DEMONSTRATION ONLY
+                response_json = CreatePresentation.get_instance().create_presentation().response_json
+                document_id = response_json["document_id"]
+                # document_delete_url = response_json["document_delete_url"]
+
+                delete_document.set_document_id(document_id)
+                # delete_document.set_document_delete_url(document_delete_url)
+
                 response = delete_document.delete_show_document()
             else:
                 print("Invalid Service ID")
@@ -662,18 +671,36 @@ class MyClass(object):
         try:
             delete_session = Delete.get_instance()
             # delete_session.set_session_id("")  # Actual set session id call
-            service_id = input("Choose a service: \n1) Writer\t2) Sheet\t3) Show")
+            service_id = int(input("Choose a service: \n1) Writer\t2) Sheet\t3) Show"))
             if service_id == 1:
-                delete_session.set_session_id(
-                    input("Enter the session ID to Delete: "))  # Used for demonstration
+                # USED FOR DEMONSTRATION ONLY
+                response_json = CreateDocument.get_instance().create_document().response_json
+                session_id = response_json["session_id"]
+                # session_delete_url = response_json["session_delete_url"]
+
+                delete_session.set_session_id(session_id)
+                # delete_session.set_session_delete_url(session_delete_url)
+
                 response = delete_session.delete_writer_session()
             elif service_id == 2:
-                delete_session.set_session_id(
-                    input("Enter the session ID to Delete: "))  # Used for demonstration
+                # USED FOR DEMONSTRATION ONLY
+                response_json = CreateSpreadsheet.get_instance().create_spreadsheet().response_json
+                session_id = response_json["session_id"]
+                # session_delete_url = response_json["session_delete_url"]
+
+                delete_session.set_session_id(session_id)
+                # delete_session.set_session_delete_url(session_delete_url)
+
                 response = delete_session.delete_sheet_session()
             elif service_id == 3:
-                delete_session.set_session_id(
-                    input("Enter the session ID to Delete: "))  # Used for demonstration
+                # USED FOR DEMONSTRATION ONLY
+                response_json = CreatePresentation.get_instance().create_presentation().response_json
+                session_id = response_json["session_id"]
+                # session_delete_url = response_json["session_delete_url"]
+
+                delete_session.set_session_id(session_id)
+                # delete_session.set_session_delete_url(session_delete_url)
+
                 response = delete_session.delete_show_session()
             else:
                 print("Invalid Service ID")
@@ -684,137 +711,6 @@ class MyClass(object):
 
             # To save API response as JSON file
             MyClass.save_response_as_json_file("DeleteSession", response_json)
-        except ZOIException as ex:
-            print(ex.status_code)
-            print(ex.error_code)
-            print(ex.error_message)
-            print(ex.error_details)
-            print(ex.error_content)
-
-    @staticmethod
-    def delete_writer_document():
-        try:
-            delete_writer_document = Delete.get_instance()
-
-            print("Use created document ID: " + str(MyClass.created_document_id) + "\n")
-
-            # delete_writer_document.set_document_id("")  # Actual set document id call
-            delete_writer_document.set_document_id(
-                input("Enter the document ID to delete: "))  # Used for demonstration
-            response = delete_writer_document.delete_writer_document()
-            response_json = response.response_json
-            for key in response_json:
-                print("{0}: {1}".format(key, response_json[key]))
-
-            # To save API response as JSON file
-            MyClass.save_response_as_json_file("DeleteWriterDocument", response_json)
-        except ZOIException as ex:
-            print(ex.status_code)
-            print(ex.error_code)
-            print(ex.error_message)
-            print(ex.error_details)
-            print(ex.error_content)
-
-    @staticmethod
-    def delete_writer_session():
-        try:
-            delete_writer_session = Delete.get_instance()
-
-            print("Use created session ID: " + str(MyClass.created_session_id) + "\n")
-
-            # delete_writer_session.set_session_id("")  # Actual set session id call
-            delete_writer_session.set_session_id(
-                input("Enter the session ID to Delete: "))  # Used for demonstration
-            response = delete_writer_session.delete_writer_session()
-            response_json = response.response_json
-            for key in response_json:
-                print("{0}: {1}".format(key, response_json[key]))
-
-            # To save API response as JSON file
-            MyClass.save_response_as_json_file("DeleteWriterSession", response_json)
-        except ZOIException as ex:
-            print(ex.status_code)
-            print(ex.error_code)
-            print(ex.error_message)
-            print(ex.error_details)
-            print(ex.error_content)
-
-    @staticmethod
-    def delete_sheet_document():
-        try:
-            delete_sheet_document = Delete.get_instance()
-            # delete_sheet_document.set_document_id("")  # Actual set document id call
-            delete_sheet_document.set_document_id(
-                input("Enter the document ID to delete: "))  # Used for demonstration
-            response = delete_sheet_document.delete_sheet_document()
-            response_json = response.response_json
-            for key in response_json:
-                print("{0}: {1}".format(key, response_json[key]))
-
-            # To save API response as JSON file
-            MyClass.save_response_as_json_file("DeleteSheetDocument", response_json)
-        except ZOIException as ex:
-            print(ex.status_code)
-            print(ex.error_code)
-            print(ex.error_message)
-            print(ex.error_details)
-            print(ex.error_content)
-
-    @staticmethod
-    def delete_sheet_session():
-        try:
-            delete_sheet_session = Delete.get_instance()
-            # delete_sheet_session.set_session_id("")  # Actual set session id call
-            delete_sheet_session.set_session_id(
-                input("Enter the session ID to Delete: "))  # Used for demonstration
-            response = delete_sheet_session.delete_sheet_session()
-            response_json = response.response_json
-            for key in response_json:
-                print("{0}: {1}".format(key, response_json[key]))
-
-            # To save API response as JSON file
-            MyClass.save_response_as_json_file("DeleteSheetSession", response_json)
-        except ZOIException as ex:
-            print(ex.status_code)
-            print(ex.error_code)
-            print(ex.error_message)
-            print(ex.error_details)
-            print(ex.error_content)
-
-    @staticmethod
-    def delete_show_document():
-        try:
-            delete_show_document = Delete.get_instance()
-            # delete_show_document.set_document_id("")  # Actual set document id call
-            delete_show_document.set_document_id(
-                input("Enter the document ID to delete: "))  # Used for demonstration
-            response = delete_show_document.delete_show_document()
-            response_json = response.response_json
-            for key in response_json:
-                print("{0}: {1}".format(key, response_json[key]))
-
-            # To save API response as JSON file
-            MyClass.save_response_as_json_file("DeleteShowDocument", response_json)
-        except ZOIException as ex:
-            print(ex.status_code)
-            print(ex.error_code)
-            print(ex.error_message)
-            print(ex.error_details)
-            print(ex.error_content)
-
-    @staticmethod
-    def delete_show_session():
-        try:
-            delete_show_session = Delete.get_instance()
-            # delete_show_session.set_session_id("") # Actual set session id call
-            delete_show_session.set_session_id(input("Enter the session ID to Delete: "))  # Used for demonstration
-            response = delete_show_session.delete_show_session()
-            response_json = response.response_json
-            for key in response_json:
-                print("{0}: {1}".format(key, response_json[key]))
-
-            # To save API response as JSON file
-            MyClass.save_response_as_json_file("DeleteShowSession", response_json)
         except ZOIException as ex:
             print(ex.status_code)
             print(ex.error_code)
@@ -868,7 +764,7 @@ if __name__ == "__main__":
 
     input("\nPress Enter To Test Get Fields API(Merged fields in document will be returned as response):\n")
 
-    print("Input document with merge fields: demo/files/ZohoWriter_MergeTemplete.docx")
+    print("Input document with merge fields: demo/files/ZohoWriter_MergeTemplate.docx")
 
     obj.get_fields()
 
@@ -900,9 +796,9 @@ if __name__ == "__main__":
 
     obj.co_edit_spreadsheet()
 
-    input("\nPress Enter To Test Preview Spreadsheet API:\n")
+    """input("\nPress Enter To Test Preview Spreadsheet API:\n")
 
-    obj.preview_spreadsheet()
+    obj.preview_spreadsheet()"""
 
     input("\nPress Enter To Test Create Presentation API:\n")
 
@@ -926,8 +822,8 @@ if __name__ == "__main__":
 
     input("\nPress Enter To Test Delete Document API:\n")
 
-    obj.delete_writer_document()
+    obj.delete_document()
 
     input("\nPress Enter To Test Delete Session API:\n")
 
-    obj.delete_writer_session()
+    obj.delete_session()

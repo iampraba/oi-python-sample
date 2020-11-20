@@ -1,6 +1,6 @@
 from controllers.APIHelper import APIResponse, FileAPIResponse
 from controllers.ClientSideException import ZOIException
-from controllers.Operations import ConvertDocument
+from controllers.Operations import MergeAndDownload
 from controllers.RestClient import ZOIRestClient
 
 
@@ -32,28 +32,37 @@ def configure():
 
 def sample_1():
     try:
-        oi_demo_obj = ConvertDocument.get_instance()
+        oi_demo_obj = MergeAndDownload.get_instance()
 
-        oi_demo_obj.set_url("https://file-examples-com.github.io/uploads/2017/02/file-sample_500kB.docx")
+        oi_demo_obj.set_output_format("docx")
 
-        oi_demo_obj.set_output_options("format", "pdf")
-        # oi_demo_obj.set_output_options("document_name", "Untitled")
-        # oi_demo_obj.set_output_options("password", "***")
-        oi_demo_obj.set_output_options("include_changes", "as_markups")
-        oi_demo_obj.set_output_options("include_comments", "all")
+        oi_demo_obj.upload_document("file_content", "../files/ZohoWriter_MergeTemplate.docx")
+        # oi_demo_obj.set_file_url("URL")
+
+        merge_data_1 = {
+            "name": "Amelia",
+            "email": "amelia@zylker.com"
+        }
+        merge_data_2 = {
+            "name": "Sylvia",
+            "email": "sylvia@zylker.com"
+        }
+        oi_demo_obj.add_merge_data(merge_data_1)
+        oi_demo_obj.add_merge_data(merge_data_2)
 
         # oi_demo_obj.set_password("***")
 
-        response = oi_demo_obj.convert_document()
+        response = oi_demo_obj.merge_and_download()
         if isinstance(response, APIResponse):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
         elif isinstance(response, FileAPIResponse):
             output_file_name = "conversion_" + response.file_name
+            output_file_name = output_file_name.replace("\"", "")
             with open(output_file_name, "wb") as f:
                 f.write(response.file_content)
-            print("Converted document stored in output folder with filename : " + output_file_name)
+            print("Merged document stored in output folder with filename : " + output_file_name)
         else:
             print(str(response))
     except ZOIException as ex:
@@ -66,30 +75,29 @@ def sample_1():
 
 def sample_2():
     try:
-        oi_demo_obj = ConvertDocument.get_instance()
+        oi_demo_obj = MergeAndDownload.get_instance()
 
-        oi_demo_obj.upload_document("document", "../files/ZohoWriter.docx")
+        oi_demo_obj.set_output_format("pdf")
 
-        oi_demo_obj.set_bulk_output_options(
-            format="odt",
-            # document_name="Untitled",
-            # password="***",
-            include_changes="as_markups",
-            include_comments="all"
-        )
+        oi_demo_obj.upload_document("file_content", "../files/ZohoWriter_MergeTemplate.docx")
+        # oi_demo_obj.set_file_url("URL")
+
+        oi_demo_obj.upload_document("merge_data_json_content", "../files/merge_data.json")
+        # oi_demo_obj.upload_document("merge_data_csv_content", "PATH_TO_CSV_FILE")
 
         # oi_demo_obj.set_password("***")
 
-        response = oi_demo_obj.convert_document()
+        response = oi_demo_obj.merge_and_download()
         if isinstance(response, APIResponse):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
         elif isinstance(response, FileAPIResponse):
             output_file_name = "conversion_" + response.file_name
+            output_file_name = output_file_name.replace("\"", "")
             with open(output_file_name, "wb") as f:
                 f.write(response.file_content)
-            print("Converted document stored in output folder with filename : " + output_file_name)
+            print("Merged document stored in output folder with filename : " + output_file_name)
         else:
             print(str(response))
     except ZOIException as ex:
@@ -102,31 +110,40 @@ def sample_2():
 
 def sample_3():
     try:
-        oi_demo_obj = ConvertDocument.get_instance()
+        oi_demo_obj = MergeAndDownload.get_instance()
 
-        oi_demo_obj.upload_document("document", "../files/ZohoWriter.docx")
+        oi_demo_obj.set_output_format("docx")
 
-        output_options = {
-            "format": "rtf",
-            # document_name: "Untitled",
-            # password: "***",
-            "include_changes": "as_markups",
-            "include_comments": "all"
-        }
-        oi_demo_obj.set_bulk_output_options(output_options)
+        oi_demo_obj.upload_document("file_content", "../files/ZohoWriter_MergeTemplate.docx")
+        # oi_demo_obj.set_file_url("URL")
+
+        merge_data = [
+            {
+                "name": "Amelia",
+                "email": "amelia@zylker.com"
+            },
+            {
+                "name": "Sylvia",
+                "email": "sylvia@zylker.com"
+            }
+        ]
+        oi_demo_obj.add_merge_data(merge_data)
+        # oi_demo_obj.set_merge_data_csv_url("URL")
+        # oi_demo_obj.set_merge_data_json_url("URL")
 
         # oi_demo_obj.set_password("***")
 
-        response = oi_demo_obj.convert_document()
+        response = oi_demo_obj.merge_and_download()
         if isinstance(response, APIResponse):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
         elif isinstance(response, FileAPIResponse):
             output_file_name = "conversion_" + response.file_name
+            output_file_name = output_file_name.replace("\"", "")
             with open(output_file_name, "wb") as f:
                 f.write(response.file_content)
-            print("Converted document stored in output folder with filename : " + output_file_name)
+            print("Merged document stored in output folder with filename : " + output_file_name)
         else:
             print(str(response))
     except ZOIException as ex:

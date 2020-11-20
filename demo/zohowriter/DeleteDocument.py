@@ -1,6 +1,10 @@
 from controllers.ClientSideException import ZOIException
-from controllers.Operations import PreviewSpreadsheet
+from controllers.Operations import Delete, CreateDocument
 from controllers.RestClient import ZOIRestClient
+
+document_id = None
+
+document_delete_url = None
 
 
 def configure():
@@ -29,14 +33,38 @@ def configure():
         print(ex.error_content)
 
 
+def create_document():
+    """
+    Used to demonstrate working of Delete Document API
+    """
+    try:
+        oi_demo_obj = CreateDocument.get_instance()
+
+        response = oi_demo_obj.create_document()
+        response_json = response.response_json
+
+        global document_id, document_delete_url
+        document_id = response_json["document_id"]
+        document_delete_url = response_json["document_delete_url"]
+    except ZOIException as ex:
+        print(ex.status_code)
+        print(ex.error_code)
+        print(ex.error_message)
+        print(ex.error_details)
+        print(ex.error_content)
+
+
 def sample_1():
     try:
-        oi_demo_obj = PreviewSpreadsheet.get_instance()
+        print("Created sample document...\ndocument_id: " + str(document_id) + "\ndocument_delete_url: " + str(
+            document_delete_url), end="\n\n")
 
-        # oi_demo_obj.set_url("https://file-examples-com.github.io/uploads/2017/02/file_example_XLSX_5000.xlsx")
-        oi_demo_obj.upload_document("document", "../files/ZohoSheet.xlsx")
+        oi_demo_obj = Delete.get_instance()
 
-        response = oi_demo_obj.preview_spreadsheet()
+        oi_demo_obj.set_document_id(document_id)
+        # oi_demo_obj.set_document_delete_url(document_delete_url)
+
+        response = oi_demo_obj.delete_writer_document()
         response_json = response.response_json
         for key in response_json:
             print("{0}: {1}".format(key, response_json[key]))
@@ -50,4 +78,7 @@ def sample_1():
 
 if __name__ == '__main__':
     configure()
+    print()
+    create_document()
+    print()
     sample_1()

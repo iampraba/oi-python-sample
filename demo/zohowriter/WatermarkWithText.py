@@ -1,6 +1,6 @@
 from controllers.APIHelper import APIResponse, FileAPIResponse
 from controllers.ClientSideException import ZOIException
-from controllers.Operations import ConvertDocument
+from controllers.Operations import WatermarkDocument
 from controllers.RestClient import ZOIRestClient
 
 
@@ -32,28 +32,28 @@ def configure():
 
 def sample_1():
     try:
-        oi_demo_obj = ConvertDocument.get_instance()
+        oi_demo_obj = WatermarkDocument.get_instance()
+
+        oi_demo_obj.set_watermark_settings("type", "text")
+        oi_demo_obj.set_watermark_settings("text", "DRAFT")
+        oi_demo_obj.set_watermark_settings("orientation", "diagonal")
+        oi_demo_obj.set_watermark_settings("font_name", "Arial")
+        oi_demo_obj.set_watermark_settings("font_size", 36)
+        oi_demo_obj.set_watermark_settings("font_color", "#000000")
+        oi_demo_obj.set_watermark_settings("opacity", "0.5")
 
         oi_demo_obj.set_url("https://file-examples-com.github.io/uploads/2017/02/file-sample_500kB.docx")
 
-        oi_demo_obj.set_output_options("format", "pdf")
-        # oi_demo_obj.set_output_options("document_name", "Untitled")
-        # oi_demo_obj.set_output_options("password", "***")
-        oi_demo_obj.set_output_options("include_changes", "as_markups")
-        oi_demo_obj.set_output_options("include_comments", "all")
-
-        # oi_demo_obj.set_password("***")
-
-        response = oi_demo_obj.convert_document()
+        response = oi_demo_obj.watermark_document()
         if isinstance(response, APIResponse):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
         elif isinstance(response, FileAPIResponse):
-            output_file_name = "conversion_" + response.file_name
+            output_file_name = "watermark_" + response.file_name
             with open(output_file_name, "wb") as f:
                 f.write(response.file_content)
-            print("Converted document stored in output folder with filename : " + output_file_name)
+            print("\nWatermark output file saved in output folder with filename : " + output_file_name)
         else:
             print(str(response))
     except ZOIException as ex:
@@ -66,30 +66,30 @@ def sample_1():
 
 def sample_2():
     try:
-        oi_demo_obj = ConvertDocument.get_instance()
+        oi_demo_obj = WatermarkDocument.get_instance()
 
-        oi_demo_obj.upload_document("document", "../files/ZohoWriter.docx")
-
-        oi_demo_obj.set_bulk_output_options(
-            format="odt",
-            # document_name="Untitled",
-            # password="***",
-            include_changes="as_markups",
-            include_comments="all"
+        oi_demo_obj.set_bulk_watermark_settings(
+            type="text",
+            text="DRAFT",
+            orientation="diagonal",
+            font_name="Arial",
+            font_size=36,
+            font_color="#000000",
+            opacity="0.5"
         )
 
-        # oi_demo_obj.set_password("***")
+        oi_demo_obj.upload_document("document", "../files/ZohoWriter_Watermark.docx")
 
-        response = oi_demo_obj.convert_document()
+        response = oi_demo_obj.watermark_document()
         if isinstance(response, APIResponse):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
         elif isinstance(response, FileAPIResponse):
-            output_file_name = "conversion_" + response.file_name
+            output_file_name = "watermark_" + response.file_name
             with open(output_file_name, "wb") as f:
                 f.write(response.file_content)
-            print("Converted document stored in output folder with filename : " + output_file_name)
+            print("\nWatermark output file saved in output folder with filename : " + output_file_name)
         else:
             print(str(response))
     except ZOIException as ex:
@@ -102,31 +102,31 @@ def sample_2():
 
 def sample_3():
     try:
-        oi_demo_obj = ConvertDocument.get_instance()
+        oi_demo_obj = WatermarkDocument.get_instance()
 
-        oi_demo_obj.upload_document("document", "../files/ZohoWriter.docx")
-
-        output_options = {
-            "format": "rtf",
-            # document_name: "Untitled",
-            # password: "***",
-            "include_changes": "as_markups",
-            "include_comments": "all"
+        watermark_settings = {
+            "type": "text",
+            "text": "DRAFT",
+            "orientation": "diagonal",
+            "font_name": "Arial",
+            "font_size": 36,
+            "font_color": "#000000",
+            "opacity": 0.0
         }
-        oi_demo_obj.set_bulk_output_options(output_options)
+        oi_demo_obj.set_bulk_watermark_settings(watermark_settings)
 
-        # oi_demo_obj.set_password("***")
+        oi_demo_obj.upload_document("document", "../files/ZohoWriter_Watermark.docx")
 
-        response = oi_demo_obj.convert_document()
+        response = oi_demo_obj.watermark_document()
         if isinstance(response, APIResponse):
             response_json = response.response_json
             for key in response_json:
                 print("{0}: {1}".format(key, response_json[key]))
         elif isinstance(response, FileAPIResponse):
-            output_file_name = "conversion_" + response.file_name
+            output_file_name = "watermark_" + response.file_name
             with open(output_file_name, "wb") as f:
                 f.write(response.file_content)
-            print("Converted document stored in output folder with filename : " + output_file_name)
+            print("\nWatermark output file saved in output folder with filename : " + output_file_name)
         else:
             print(str(response))
     except ZOIException as ex:
