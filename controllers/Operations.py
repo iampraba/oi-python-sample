@@ -2,9 +2,6 @@ from controllers.RestClient import ZOIConfigUtil
 from controllers.Utility import CommonUtil
 
 
-# from controllers.Utility import DocumentDefaults, SheetDefaults, ShowDefaults
-
-
 class DocumentModel:
 
     def __init__(self):
@@ -65,12 +62,6 @@ class CreateDocument(DocumentModel):
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document"
 
         self.isCreate = is_create
-
-        """
-        # Initializing parameters with Defaults
-        if self.isCreate and not self.isCreateTemplate:
-            DocumentDefaults.set_default_create_document_settings(self)
-        """
 
     @staticmethod
     def get_instance():
@@ -268,11 +259,6 @@ class EditDocument(CreateDocument):
     def __init__(self):
         super().__init__(is_create=False)
 
-        """
-        # Initializing parameters with Defaults
-        DocumentDefaults.set_default_edit_document_settings(self)
-        """
-
     @staticmethod
     def get_instance():
         return EditDocument()
@@ -320,11 +306,6 @@ class PreviewDocument(DocumentModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/preview"
 
-        """
-        # Initializing parameters with Defaults
-        DocumentDefaults.set_default_preview_document_settings(self)
-        """
-
     @staticmethod
     def get_instance():
         return PreviewDocument()
@@ -358,11 +339,6 @@ class WatermarkDocument(DocumentModel):
     def __init__(self):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/watermark"
-
-        """
-        # Initializing parameters with Defaults
-        DocumentDefaults.set_default_watermark_settings(self)
-        """
 
     @staticmethod
     def get_instance():
@@ -427,11 +403,6 @@ class CreateTemplate(CreateDocument):
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "template"
         self.isCreateTemplate = True
 
-        """
-        # Initializing parameters with Defaults
-        DocumentDefaults.set_default_create_template_settings(self)
-        """
-
     @staticmethod
     def get_instance():
         return CreateTemplate()
@@ -489,11 +460,6 @@ class MergeAndDeliver(DocumentModel):
     def __init__(self):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/merge/webhook"
-
-        """
-        # Initializing parameters with Defaults
-        DocumentDefaults.set_default_merge_and_deliver_via_webhook(self)
-        """
 
     @staticmethod
     def get_instance():
@@ -571,11 +537,6 @@ class MergeAndDownload(DocumentModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/merge/download"
 
-        """
-        # Initializing parameters with Defaults
-        DocumentDefaults.set_default_merge_and_download_settings(self)
-        """
-
     @staticmethod
     def get_instance():
         return MergeAndDownload()
@@ -617,11 +578,6 @@ class ConvertDocument(DocumentModel):
     def __init__(self):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/convert"
-
-        """
-        # Initializing parameters with Defaults
-        DocumentDefaults.set_default_convert_document_settings(self)
-        """
 
     @staticmethod
     def get_instance():
@@ -681,11 +637,6 @@ class CompareDocuments(DocumentModel):
     def __init__(self):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_writer_api_base_url() + "document/compare"
-
-        """
-        # Initializing parameters with Defaults
-        DocumentDefaults.set_default_compare_document_settings(self)
-        """
 
     @staticmethod
     def get_instance():
@@ -873,11 +824,6 @@ class CreateSpreadsheet(SheetShowModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_sheet_api_base_url() + "spreadsheet"
 
-        """
-        # Initializing parameters with Defaults
-        SheetDefaults.set_default_create_spreadsheet_settings(self)
-        """
-
     @staticmethod
     def get_instance():
         return CreateSpreadsheet()
@@ -895,11 +841,6 @@ class EditSpreadsheet(SheetShowModel):
     def __init__(self):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_sheet_api_base_url() + "spreadsheet"
-
-        """
-        # Initializing parameters with Defaults
-        SheetDefaults.set_default_edit_spreadsheet_settings(self)
-        """
 
     @staticmethod
     def get_instance():
@@ -919,11 +860,6 @@ class CoEditSpreadsheet(SheetShowModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_sheet_api_base_url() + "spreadsheet"
 
-        """
-        # Initializing parameters with Defaults
-        SheetDefaults.set_default_co_edit_spreadsheet_settings(self)
-        """
-
     @staticmethod
     def get_instance():
         return CoEditSpreadsheet()
@@ -941,11 +877,6 @@ class PreviewSpreadsheet(SheetShowModel):
     def __init__(self):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_sheet_api_base_url() + "spreadsheet/preview"
-
-        """
-        # Initializing parameters with Defaults
-        SheetDefaults.set_default_preview_spreadsheet_settings(self)
-        """
 
     @staticmethod
     def get_instance():
@@ -965,11 +896,6 @@ class CreatePresentation(SheetShowModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_show_api_base_url() + "presentation"
 
-        """
-        # Initializing parameters with Defaults
-        ShowDefaults.set_default_create_presentation_settings(self)
-        """
-
     @staticmethod
     def get_instance():
         return CreatePresentation()
@@ -987,11 +913,6 @@ class EditPresentation(SheetShowModel):
     def __init__(self):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_show_api_base_url() + "presentation"
-
-        """
-        # Initializing parameters with Defaults
-        ShowDefaults.set_default_edit_presentation_settings(self)
-        """
 
     @staticmethod
     def get_instance():
@@ -1011,11 +932,6 @@ class CoEditPresentation(SheetShowModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_show_api_base_url() + "presentation"
 
-        """
-        # Initializing parameters with Defaults
-        ShowDefaults.set_default_co_edit_presentation_settings(self)
-        """
-
     @staticmethod
     def get_instance():
         return CoEditPresentation()
@@ -1034,11 +950,6 @@ class PreviewPresentation(SheetShowModel):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_show_api_base_url() + "presentation/preview"
 
-        """
-        # Initializing parameters with Defaults
-        ShowDefaults.set_default_preview_presentation_settings(self)
-        """
-
     @staticmethod
     def get_instance():
         return PreviewPresentation()
@@ -1056,11 +967,6 @@ class ConvertPresentation(SheetShowModel):
     def __init__(self):
         super().__init__()
         self.api_end_point = ZOIConfigUtil.get_show_api_base_url() + "presentation/convert"
-
-        """
-        # Initializing parameters with Defaults
-        ShowDefaults.set_default_conversion_api_settings(self)
-        """
 
     @staticmethod
     def get_instance():

@@ -623,6 +623,7 @@ class MyClass(object):
             if service_id == 1:
                 # USED FOR DEMONSTRATION ONLY
                 response_json = CreateDocument.get_instance().create_document().response_json
+
                 document_id = response_json["document_id"]
                 # document_delete_url = response_json["document_delete_url"]
 
@@ -633,6 +634,7 @@ class MyClass(object):
             elif service_id == 2:
                 # USED FOR DEMONSTRATION ONLY
                 response_json = CreateSpreadsheet.get_instance().create_spreadsheet().response_json
+
                 document_id = response_json["document_id"]
                 # document_delete_url = response_json["document_delete_url"]
 
@@ -643,6 +645,7 @@ class MyClass(object):
             elif service_id == 3:
                 # USED FOR DEMONSTRATION ONLY
                 response_json = CreatePresentation.get_instance().create_presentation().response_json
+
                 document_id = response_json["document_id"]
                 # document_delete_url = response_json["document_delete_url"]
 
@@ -675,6 +678,7 @@ class MyClass(object):
             if service_id == 1:
                 # USED FOR DEMONSTRATION ONLY
                 response_json = CreateDocument.get_instance().create_document().response_json
+
                 session_id = response_json["session_id"]
                 # session_delete_url = response_json["session_delete_url"]
 
@@ -685,6 +689,7 @@ class MyClass(object):
             elif service_id == 2:
                 # USED FOR DEMONSTRATION ONLY
                 response_json = CreateSpreadsheet.get_instance().create_spreadsheet().response_json
+
                 session_id = response_json["session_id"]
                 # session_delete_url = response_json["session_delete_url"]
 
@@ -695,6 +700,7 @@ class MyClass(object):
             elif service_id == 3:
                 # USED FOR DEMONSTRATION ONLY
                 response_json = CreatePresentation.get_instance().create_presentation().response_json
+
                 session_id = response_json["session_id"]
                 # session_delete_url = response_json["session_delete_url"]
 
