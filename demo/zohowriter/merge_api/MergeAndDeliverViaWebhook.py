@@ -35,7 +35,7 @@ def sample_1():
 
         oi_demo_obj.set_output_format("docx")
 
-        oi_demo_obj.upload_document("file_content", "../files/ZohoWriter_MergeTemplate.docx")
+        oi_demo_obj.upload_document("file_content", "../../files/ZohoWriter_MergeTemplate.docx")
         # oi_demo_obj.set_file_url("URL")
 
         oi_demo_obj.set_webhook("invoke_url", "https://domain.com/xyz.php")
@@ -74,7 +74,7 @@ def sample_2():
 
         oi_demo_obj.set_output_format("pdf")
 
-        oi_demo_obj.upload_document("file_content", "../files/ZohoWriter_MergeTemplate.docx")
+        oi_demo_obj.upload_document("file_content", "../../files/ZohoWriter_MergeTemplate.docx")
         # oi_demo_obj.set_file_url("URL")
 
         oi_demo_obj.set_bulk_webhook_settings(
@@ -84,7 +84,7 @@ def sample_2():
 
         oi_demo_obj.set_merge_to("separatedoc")
 
-        oi_demo_obj.upload_document("merge_data_json_content", "../files/merge_data.json")
+        oi_demo_obj.upload_document("merge_data_json_content", "../../files/merge_data.json")
         # oi_demo_obj.upload_document("merge_data_csv_content", "PATH_TO_CSV_FILE")
 
         # oi_demo_obj.set_password("***")
@@ -107,7 +107,7 @@ def sample_3():
 
         oi_demo_obj.set_output_format("docx")
 
-        oi_demo_obj.upload_document("file_content", "../files/ZohoWriter_MergeTemplate.docx")
+        oi_demo_obj.upload_document("file_content", "../../files/ZohoWriter_MergeTemplate.docx")
         # oi_demo_obj.set_file_url("URL")
 
         webhook = {

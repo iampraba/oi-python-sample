@@ -38,6 +38,21 @@ def sample_1():
         oi_demo_obj.set_callback_settings("save_format", "xlsx")
         oi_demo_obj.set_callback_settings("save_url", "https://zylker.com/save.php")
         oi_demo_obj.set_callback_settings("context_info", "additional doc or user info")
+        '''
+            "save_url_params"
+                If you wish to customize the above default keys or add some extra data that you need to 
+            send back during save call, you can make use of the 'save_url_params' key of 'callback_settings' parameter.
+                For more details regarding usage of save_url_params, 
+            Visit https://www.zoho.com/officeplatform/integrator/api/v1/zoho-writer-create-document.html#saveurl_params
+        '''
+        save_url_params = {
+            "file": "$content",
+            "extension": "$format",
+            "document_name": "$filename",
+            "key1": "hgbb83h8ghejd92002jfnd",  # additional_user_key
+            "key2": "p0oiu9ytr8e7sa65dfghj4",  # additional_user_key...
+        }
+        oi_demo_obj.set_callback_settings("save_url_params", save_url_params)
 
         oi_demo_obj.set_editor_settings("language", "en")
         oi_demo_obj.set_editor_settings("country", "IN")
@@ -72,7 +87,14 @@ def sample_2():
         oi_demo_obj.set_bulk_callback_settings(
             save_format="xlsx",
             save_url="https://zylker.com/save.php",
-            context_info="additional doc or user info"
+            context_info="additional doc or user info",
+            save_url_params={
+                "file": "$content",
+                "extension": "$format",
+                "document_name": "$filename",
+                "key1": "hgbb83h8ghejd92002jfnd",  # additional_user_key
+                "key2": "p0oiu9ytr8e7sa65dfghj4",  # additional_user_key...
+            }
         )
 
         oi_demo_obj.set_bulk_editor_settings(
@@ -114,7 +136,14 @@ def sample_3():
         callback_settings = {
             "save_format": "xlsx",
             "save_url": "https://zylker.com/save.php",
-            "context_info": "additional doc or user info"
+            "context_info": "additional doc or user info",
+            "save_url_params": {
+                "file": "$content",
+                "extension": "$format",
+                "document_name": "$filename",
+                "key1": "hgbb83h8ghejd92002jfnd",  # additional_user_key
+                "key2": "p0oiu9ytr8e7sa65dfghj4",  # additional_user_key...
+            }
         }
         oi_demo_obj.set_bulk_callback_settings(callback_settings)
 

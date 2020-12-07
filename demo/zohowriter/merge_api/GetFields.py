@@ -33,7 +33,7 @@ def sample_1():
     try:
         oi_demo_obj = GetFields.get_instance()
 
-        oi_demo_obj.upload_document("file_content", "../files/ZohoWriter_MergeTemplate.docx")
+        oi_demo_obj.upload_document("file_content", "../../files/ZohoWriter_MergeTemplate.docx")
 
         response = oi_demo_obj.get_fields()
         response_json = response.response_json

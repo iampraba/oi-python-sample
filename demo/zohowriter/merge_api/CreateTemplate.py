@@ -73,7 +73,7 @@ def sample_1():
         oi_demo_obj.set_ui_options("save_button", "show")
         oi_demo_obj.set_ui_options("chat_panel", "show")
 
-        oi_demo_obj.upload_document("merge_data_json_content", "../files/merge_data.json")
+        oi_demo_obj.upload_document("merge_data_json_content", "../../files/merge_data.json")
 
         response = oi_demo_obj.create_template()
         response_json = response.response_json
@@ -140,7 +140,7 @@ def sample_2():
             chat_panel="show"
         )
 
-        oi_demo_obj.upload_document("merge_data_json_content", "../files/merge_data.json")
+        oi_demo_obj.upload_document("merge_data_json_content", "../../files/merge_data.json")
 
         oi_demo_obj.set_url("https://file-examples-com.github.io/uploads/2017/02/file-sample_500kB.docx")
 
@@ -221,9 +221,9 @@ def sample_3():
         }
         oi_demo_obj.set_bulk_ui_options(ui_options)
 
-        oi_demo_obj.upload_document("merge_data_json_content", "../files/merge_data.json")
+        oi_demo_obj.upload_document("merge_data_json_content", "../../files/merge_data.json")
 
-        oi_demo_obj.upload_document("document", "../files/ZohoWriter.docx")
+        oi_demo_obj.upload_document("document", "../../files/ZohoWriter.docx")
 
         response = oi_demo_obj.create_template()
         response_json = response.response_json

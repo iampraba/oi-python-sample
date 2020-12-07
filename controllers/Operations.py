@@ -733,7 +733,7 @@ class SheetShowModel(object):
     def set_format(self, value):
         self.format = value
 
-    def set_bulk_callback_settings(self, save_format=None, save_url=None, context_info=None):
+    def set_bulk_callback_settings(self, save_format=None, save_url=None, context_info=None, save_url_params=None):
 
         # If Settings are passed as a list with preferred settings
         if isinstance(save_format, dict):
@@ -749,6 +749,8 @@ class SheetShowModel(object):
                 self.callback_settings["save_url"] = save_url
             if context_info is not None:
                 self.callback_settings["context_info"] = context_info
+            if save_url_params is not None:
+                self.callback_settings["save_url_params"] = save_url_params
 
     def set_bulk_editor_settings(self, language=None, country=None):
 

@@ -78,7 +78,7 @@ def sample_2():
             opacity="0.5"
         )
 
-        oi_demo_obj.upload_document("document", "../files/ZohoWriter_Watermark.docx")
+        oi_demo_obj.upload_document("document", "../../files/ZohoWriter_Watermark.docx")
 
         response = oi_demo_obj.watermark_document()
         if isinstance(response, APIResponse):
@@ -115,7 +115,7 @@ def sample_3():
         }
         oi_demo_obj.set_bulk_watermark_settings(watermark_settings)
 
-        oi_demo_obj.upload_document("document", "../files/ZohoWriter_Watermark.docx")
+        oi_demo_obj.upload_document("document", "../../files/ZohoWriter_Watermark.docx")
 
         response = oi_demo_obj.watermark_document()
         if isinstance(response, APIResponse):

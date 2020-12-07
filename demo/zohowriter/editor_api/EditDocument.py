@@ -34,6 +34,21 @@ def sample_1():
         oi_demo_obj.set_callback_settings("save_url", "https://domain.com/save.php")
         oi_demo_obj.set_callback_settings("http_method_type", "post")
         oi_demo_obj.set_callback_settings("timeout", 120000)
+        '''
+            "save_url_params"
+                If you wish to customize the above default keys or add some extra data that you need to 
+            send back during save call, you can make use of the 'save_url_params' key of 'callback_settings' parameter.
+                For more details regarding usage of save_url_params, 
+            Visit https://www.zoho.com/officeplatform/integrator/api/v1/zoho-writer-create-document.html#saveurl_params
+        '''
+        save_url_params = {
+            "file": "$content",
+            "extension": "$format",
+            "document_name": "$filename",
+            "key1": "hgbb83h8ghejd92002jfnd",  # additional_user_key
+            "key2": "p0oiu9ytr8e7sa65dfghj4",  # additional_user_key...
+        }
+        oi_demo_obj.set_callback_settings("save_url_params", save_url_params)
 
         oi_demo_obj.set_document_defaults("track_changes", "disabled")
 
@@ -81,7 +96,13 @@ def sample_2():
         oi_demo_obj.set_bulk_callback_settings(
             save_format="docx",
             save_url="https://domain.com/save.php",
-            save_url_params=None,
+            save_url_params={
+                "file": "$content",
+                "extension": "$format",
+                "document_name": "$filename",
+                "key1": "hgbb83h8ghejd92002jfnd",  # additional_user_key
+                "key2": "p0oiu9ytr8e7sa65dfghj4",  # additional_user_key...
+            },
             http_method_type="post",
             timeout=120000,
             retries=None
@@ -117,7 +138,7 @@ def sample_2():
             chat_panel="show"
         )
 
-        oi_demo_obj.upload_document("document", "../files/ZohoWriter.docx")
+        oi_demo_obj.upload_document("document", "../../files/ZohoWriter.docx")
 
         response = oi_demo_obj.edit_document()
         response_json = response.response_json
@@ -139,7 +160,14 @@ def sample_3():
             "save_format": "docx",
             "save_url": "https://domain.com/save.php",
             "http_method_type": "post",
-            "timeout": 120000
+            "timeout": 120000,
+            "save_url_params": {
+                "file": "$content",
+                "extension": "$format",
+                "document_name": "$filename",
+                "key1": "hgbb83h8ghejd92002jfnd",  # additional_user_key
+                "key2": "p0oiu9ytr8e7sa65dfghj4",  # additional_user_key...
+            }
         }
         oi_demo_obj.set_bulk_callback_settings(callback_settings)
 
@@ -185,7 +213,7 @@ def sample_3():
         }
         oi_demo_obj.set_bulk_ui_options(ui_options)
 
-        oi_demo_obj.upload_document("document", "../files/ZohoWriter.docx")
+        oi_demo_obj.upload_document("document", "../../files/ZohoWriter.docx")
 
         response = oi_demo_obj.edit_document()
         response_json = response.response_json
